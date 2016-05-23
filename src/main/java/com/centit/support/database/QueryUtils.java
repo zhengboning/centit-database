@@ -961,7 +961,7 @@ public class QueryUtils {
      * @param paramValue
      * @return
      */
-    public static Object onePretreatParameter(String pretreatment,Object paramValue){
+    private static Object onePretreatParameter(String pretreatment,Object paramValue){
     	if(SQL_PRETREAT_LIKE.equalsIgnoreCase(pretreatment))
     		return getMatchString(String.valueOf(paramValue));
     	if(SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
