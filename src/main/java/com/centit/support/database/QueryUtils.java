@@ -32,9 +32,10 @@ public class QueryUtils {
 	public static String SQL_PRETREAT_DATE = "DATE";
 	public static String SQL_PRETREAT_DATETIME = "DATETIME";
 	public static String SQL_PRETREAT_DIGIT = "DIGIT";
+	public static String SQL_PRETREAT_UPPERCASE = "UPPERCASE";
+	public static String SQL_PRETREAT_LOWERCASE = "LOWERCASE";
 	public static String SQL_PRETREAT_NUMBER = "NUMBER";
 	public static String SQL_PRETREAT_SPLITFORIN = "SPLITFORIN";
-	public static String SQL_PRETREAT_SPLITFORINANDCREEP = "SPLITFORINANDCREEP";
 	public static String SQL_PRETREAT_CREEPFORIN = "CREEPFORIN";
 
  	
@@ -960,7 +961,7 @@ public class QueryUtils {
      * @param paramValue
      * @return
      */
-    public static Object pretreatParameter(String pretreatment,Object paramValue){
+    public static Object onePretreatParameter(String pretreatment,Object paramValue){
     	if(SQL_PRETREAT_LIKE.equalsIgnoreCase(pretreatment))
     		return getMatchString(String.valueOf(paramValue));
     	if(SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
@@ -971,14 +972,36 @@ public class QueryUtils {
     				DatetimeOpt.smartPraseDate(String.valueOf(paramValue)));
     	if(SQL_PRETREAT_DIGIT.equalsIgnoreCase(pretreatment))
     		return StringRegularOpt.trimDigits(String.valueOf(paramValue));
+    	if(SQL_PRETREAT_UPPERCASE.equalsIgnoreCase(pretreatment))
+    		return StringUtils.upperCase(String.valueOf(paramValue));
+    	if(SQL_PRETREAT_LOWERCASE.equalsIgnoreCase(pretreatment))
+    		return StringUtils.lowerCase(String.valueOf(paramValue));
     	if(SQL_PRETREAT_NUMBER.equalsIgnoreCase(pretreatment))
     		return StringRegularOpt.trimNumber(String.valueOf(paramValue));
-    	if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment)
-    			|| SQL_PRETREAT_SPLITFORINANDCREEP.equalsIgnoreCase(pretreatment))
+    	if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment))
     		return String.valueOf(paramValue).split(",");
     	//if(SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(pretreatment))
     		//return String.valueOf(paramValue).split(",");
     	return paramValue;
+    }
+    
+    /**
+     * 对参数进行预处理
+     * @param pretreatment, 可以有多个，用','分开
+     * @param paramValue
+     * @return
+     */
+    public static Object pretreatParameter(String pretreatment,Object paramValue){
+    	if(StringUtils.isBlank(pretreatment))
+    		return paramValue;
+    	if(pretreatment.indexOf(',')<0)
+    		return onePretreatParameter(pretreatment,paramValue);
+    	String [] pretreats = pretreatment.split(",");
+    	Object paramObj = paramValue;
+    	for(String p : pretreats){
+    		paramObj = onePretreatParameter(p,paramObj);
+    	}
+    	return paramObj;
     }
     
     private static ImmutableTriple<String,String,String> parseParameter(String paramString){
@@ -1074,6 +1097,12 @@ public class QueryUtils {
     	}
     	return sql;
     }
+    
+    private static boolean hasPretreatment(String pretreatStr, String onePretreat){
+    	if(pretreatStr==null) return false;
+    	
+    	return pretreatStr.toUpperCase().indexOf(onePretreat) >= 0;
+    }
     /**
 	 * 
 	 * @param tableAlias
@@ -1122,8 +1151,7 @@ public class QueryUtils {
 				
 				if(paramPair.getValue()!=null){
 					Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
-					if( SQL_PRETREAT_SPLITFORINANDCREEP.equalsIgnoreCase(paramMeta.right) ||
-							SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(paramMeta.right)){
+					if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
 						QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
 						hqlPiece.append(inSt.getQuery());
 						hqlAndParams.addAllParams(inSt.getParams());
@@ -1219,8 +1247,7 @@ public class QueryUtils {
 							KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
 							if(paramPair!=null && paramPair.getValue()!=null){
 								Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
-								if( SQL_PRETREAT_SPLITFORINANDCREEP.equalsIgnoreCase(paramMeta.right) ||
-										SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(paramMeta.right)){
+								if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
 									QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
 									
 									hqlAndParams.addAllParams(inSt.getParams());
@@ -1274,8 +1301,7 @@ public class QueryUtils {
 						return null;
 					if(addParams){
 						Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
-						if( SQL_PRETREAT_SPLITFORINANDCREEP.equalsIgnoreCase(paramMeta.right) ||
-								SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(paramMeta.right)){
+						if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
 							QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);							
 							hqlAndParams.addAllParams(inSt.getParams());
 							hqlAndParams.setQuery(replaceParamrAsCreepParams(
