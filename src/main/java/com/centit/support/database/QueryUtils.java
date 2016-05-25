@@ -1224,6 +1224,7 @@ public class QueryUtils {
 				varMorp.seekTo('}');
 				prePos = varMorp.getCurrPos();
 				String param =  filter.substring(curPos,prePos-1).trim();
+				
 				ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
 				//{paramName,paramAlias,paramPretreatment};
 				
@@ -1346,18 +1347,19 @@ public class QueryUtils {
 							if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
 								QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);									
 								hqlAndParams.addAllParams(inSt.getParams());
-								hqlAndParams.setQuery(replaceParamAsSqlString(
-										sql,paramAlias,inSt.getQuery()));
+								sql = replaceParamAsSqlString(
+										sql,paramAlias,inSt.getQuery());
 							}else if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){								
-								hqlAndParams.setQuery(replaceParamAsSqlString(
-										sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam))));
+								sql = replaceParamAsSqlString(
+										sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
 							}else{
 								hqlAndParams.addParam(paramAlias,realParam);
-								hqlAndParams.setQuery(sql);		
+									
 							}	
 						}
 					}
 				}
+				hqlAndParams.setQuery(sql);	
 			}else
 				hqlAndParams.setQuery(sql);				
 			
@@ -1392,18 +1394,19 @@ public class QueryUtils {
 						if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
 							QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);							
 							hqlAndParams.addAllParams(inSt.getParams());
-							hqlAndParams.setQuery(replaceParamAsSqlString(
-									sql,paramAlias,inSt.getQuery()));	
+							sql = replaceParamAsSqlString(
+									sql,paramAlias,inSt.getQuery());	
 						}if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){								
-							hqlAndParams.setQuery(replaceParamAsSqlString(
-									sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam))));
+							sql = replaceParamAsSqlString(
+									sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
 						}else{
-							hqlAndParams.setQuery(sql);
+							
 							hqlAndParams.addParam(paramAlias,realParam);
 						}
 					}
-				}
-			}
+				}				
+			}//end of for
+			hqlAndParams.setQuery(sql);
 		}
 		return hqlAndParams;
 	}

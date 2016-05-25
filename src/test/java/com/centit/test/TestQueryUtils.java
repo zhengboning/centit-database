@@ -123,13 +123,19 @@ public class TestQueryUtils {
 
 		Map<String,Object> paramsMap = new HashMap<String,Object>();		
 	
-		String queryStatement = "select t1.a,t2.b,t3.c "
-					+ "from table1 t1,table2 t2,table3 t3 "
-					+ "[:(uppercase,like) p4 , p2 : (lowercase,inplace)pw | and tw.a like :pw and t1.a like :p4] "
-					//+ " [ p1.1 :()  p4, : ( like )p2  | and tw.a=:p3 ]"
-					+ " order by 1,2";
-		paramsMap.put("p2", "Hello + hint' df''fad'Wor -- 'ld");
-		paramsMap.put("p4", "Good luck");
+		String queryStatement =
+				"  select unitCode,parentUnit,unitType,isValid,unitTag"				
+					    +"  from projectTable uu  "
+						+"[(isnotempty(punitCode) and punitCode <> 'null')(punitCode)|  start with uu.unitCode =:punitCode connect by prior uu.UNITCODE = uu.parentUnit]"	
+					    + " where 1=1 "
+					    +"[:(inplace)sort,:(inplace)order| order by :sort :order ]"
+						+"[(isnotempty(sort) and isempty(order))(:(inplace)sort)| order by :sort ]"
+						+"[(isempty(sort)) | order by createDate desc]"; 
+
+		
+		paramsMap.put("punitCode", "null");
+		paramsMap.put("sort", "uu.unitType");
+		paramsMap.put("order", "asc");
 		printQueryAndNamedParams(QueryUtils.translateQuery(
 				 queryStatement, null,
 				  paramsMap, true));
