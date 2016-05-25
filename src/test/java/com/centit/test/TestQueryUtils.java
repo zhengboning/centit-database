@@ -14,7 +14,7 @@ public class TestQueryUtils {
 	
 	public static void main(String[] args) {
 		//System.out.println(QueryUtils.getMatchString("hell%%'%'%wo'rd n__n"));
-		testBuildGetCountSQL();//testTemplate();
+		testTranslateQuery2();//testTemplate();
 		//CodeRepositoryUtil.loadExtendedSqlMap("D:/Projects/framework2.1/framework-sys-module2.1/src/main/resources/ExtendedSqlMap.xml");
 		//System.out.println(CodeRepositoryUtil.getExtendedSql("QUERY_ID_1"));
 	}
@@ -117,5 +117,24 @@ public class TestQueryUtils {
 		System.out.println(StringBaseOpt.objectToString(
 				QueryUtils.getSqlTemplateFiledNames(queryStatement)));
 	}
+	
+	public static void testTranslateQuery2() {
+	
+
+		Map<String,Object> paramsMap = new HashMap<String,Object>();		
+	
+		String queryStatement = "select t1.a,t2.b,t3.c "
+					+ "from table1 t1,table2 t2,table3 t3 "
+					+ "[:(uppercase,like) p4 , p2 : (lowercase,like,inplace,QUOTASTR)pw | and tw.a like :pw and t1.a like :p4] "
+					//+ " [ p1.1 :()  p4, : ( like )p2  | and tw.a=:p3 ]"
+					+ " order by 1,2";
+		paramsMap.put("p2", "Hello World!");
+		paramsMap.put("p4", "Good luck");
+		printQueryAndNamedParams(QueryUtils.translateQuery(
+				 queryStatement, null,
+				  paramsMap, true));
+		
+	}
+	
 	
 }
