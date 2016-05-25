@@ -66,7 +66,7 @@ public class QueryAndParams {
  
     	StringBuilder sqlb = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);       
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);       
         
         int prePos = 0;
         int paramInd = -1;
@@ -121,7 +121,7 @@ public class QueryAndParams {
  
     	StringBuilder sqlb = new StringBuilder();
         List<Object> params = new ArrayList<Object>();
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);       
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);       
         
         int prePos = 0;
         String aWord = lex.getAWord();

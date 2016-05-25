@@ -125,10 +125,10 @@ public class TestQueryUtils {
 	
 		String queryStatement = "select t1.a,t2.b,t3.c "
 					+ "from table1 t1,table2 t2,table3 t3 "
-					+ "[:(uppercase,like) p4 , p2 : (lowercase,like,inplace,QUOTASTR)pw | and tw.a like :pw and t1.a like :p4] "
+					+ "[:(uppercase,like) p4 , p2 : (lowercase,inplace)pw | and tw.a like :pw and t1.a like :p4] "
 					//+ " [ p1.1 :()  p4, : ( like )p2  | and tw.a=:p3 ]"
 					+ " order by 1,2";
-		paramsMap.put("p2", "Hello World!");
+		paramsMap.put("p2", "Hello + hint' df''fad'Wor -- 'ld");
 		paramsMap.put("p4", "Good luck");
 		printQueryAndNamedParams(QueryUtils.translateQuery(
 				 queryStatement, null,

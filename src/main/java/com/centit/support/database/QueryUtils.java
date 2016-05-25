@@ -234,7 +234,7 @@ public class QueryUtils {
 	 * @return
 	 */
     public static String removeOrderBy(String sql){
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
         int nPos = lex.getCurrPos();
         while (aWord != null && !"".equals(aWord) && !"order".equalsIgnoreCase(aWord)) {
@@ -255,7 +255,7 @@ public class QueryUtils {
 	 * @return
 	 */
     public static String getGroupByField(String sql){
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
         
         while (aWord != null && !"".equals(aWord) && !"group".equalsIgnoreCase(aWord)) {
@@ -298,7 +298,7 @@ public class QueryUtils {
      */
     public static List<String> splitSqlByFields(String sql){
         
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         List<String> sqlPiece = new ArrayList<String>();
         int sl = sql.length();
         String aWord = lex.getAWord();
@@ -531,7 +531,7 @@ public class QueryUtils {
     public static KeyValuePair<String,List<String>> getSqlNamedParameters(String sql){
         StringBuilder sqlb = new StringBuilder();
         List<String> params = new ArrayList<String>();
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
@@ -560,7 +560,7 @@ public class QueryUtils {
     private static Set<String> getTemplateParams(
 			String queryPiece){
 
-		Lexer varMorp = new Lexer(queryPiece,Lexer.NOTE_TYPE_SQL);
+		Lexer varMorp = new Lexer(queryPiece,Lexer.LANG_TYPE_SQL);
 		String aWord = varMorp.getARawWord();
 		if(aWord==null || aWord.length() == 0)
 			return null;
@@ -575,7 +575,7 @@ public class QueryUtils {
 			int prePos = varMorp.getCurrPos();
 			String condition =  queryPiece.substring(curPos,prePos-1);			
 			
-			Lexer labelSelected = new Lexer(condition,Lexer.NOTE_TYPE_SQL);
+			Lexer labelSelected = new Lexer(condition,Lexer.LANG_TYPE_SQL);
 			aWord = labelSelected.getARawWord();		
 			while(StringUtils.isNotBlank(aWord)){
 				
@@ -665,7 +665,7 @@ public class QueryUtils {
     public static Set<String> getSqlTemplateParameters(String sql){
        
     	Set<String> params = new HashSet<String>();
-        Lexer lex = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
 
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
@@ -705,7 +705,7 @@ public class QueryUtils {
             return fields;
 
         String sFieldSql = sqlPieces.get(1);
-        Lexer lex = new Lexer(sFieldSql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
 
         int nPos = 0;
         String aWord = lex.getAWord();
@@ -743,7 +743,7 @@ public class QueryUtils {
      */
     private static List<String> splitSqlFiledNames(String sFieldSql){
         List<String> fields = new ArrayList<String>();
-        Lexer lex = new Lexer(sFieldSql,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
 
         String aWord = lex.getAWord();
         String filedName = aWord;
@@ -809,7 +809,7 @@ public class QueryUtils {
             return null;
        
         String sFieldSql = sqlPieces.get(1);
-        Lexer varMorp = new Lexer(sFieldSql,Lexer.NOTE_TYPE_SQL);
+        Lexer varMorp = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
         StringBuilder sbSql = new StringBuilder();
         int prePos = 0;
         String aWord = varMorp.getAWord();
@@ -851,7 +851,7 @@ public class QueryUtils {
         
         StringBuilder sb= new StringBuilder();
         
-        Lexer lex = new Lexer(sqlOrderBy,Lexer.NOTE_TYPE_SQL);
+        Lexer lex = new Lexer(sqlOrderBy,Lexer.LANG_TYPE_SQL);
         boolean bLastDouHao = false;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
@@ -1017,7 +1017,7 @@ public class QueryUtils {
     
     private static List<String> splitParamString(String paramString){
     	List<String> params = new ArrayList<String>();
-    	Lexer lex = new Lexer(paramString,Lexer.NOTE_TYPE_SQL);
+    	Lexer lex = new Lexer(paramString,Lexer.LANG_TYPE_SQL);
     	int prePos = 0;
     	String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord) ) {            
@@ -1110,11 +1110,39 @@ public class QueryUtils {
 		return hqlAndParams;
     }
     
+    /**
+     * 去掉 分号 ； 和  单行注释   / * 注释保留 * / 
+     * @param fieldsSql
+     * @return
+     */
     private static String cleanSqlStatement(String fieldsSql){
     	if(StringUtils.isBlank(fieldsSql))
     		return fieldsSql;
-    	char [] ch = fieldsSql.toCharArray();
-    	StringBuilder sBuilder = new StringBuilder();
+    	Lexer lex = new Lexer(fieldsSql,Lexer.LANG_TYPE_SQL);
+    	String aWord = lex.getARegularWord();
+    	int prePos = 0;
+        while (aWord != null && !"".equals(aWord) ) {
+        	if(aWord.equals(";")){
+        		int currPos = lex.getCurrPos();
+        		return fieldsSql.substring(0,currPos-1);
+         	}else if(aWord.equals("--")){
+         		int currPos = lex.getCurrPos();
+         		return fieldsSql.substring(0,currPos-2);
+         	}else if(aWord.equals("/*")){
+         		int currPos = lex.getCurrPos();
+         		lex.seekToAnnotateEnd();
+         		int currPos2 = lex.getCurrPos();
+         		if(! "*/".equals(fieldsSql.substring(currPos2-2,currPos2))){
+         			return fieldsSql.substring(0,currPos-2);
+         		}
+         	}
+        	prePos = lex.getCurrPos();
+         	aWord = lex.getARegularWord();
+        }
+        return fieldsSql.substring(0,prePos);
+        
+    	/*char [] ch = fieldsSql.toCharArray();
+    	
     	for(char c :ch){
     		if ( (c>='a' && c<='z')
     				|| (c>='A' && c<='Z')
@@ -1124,15 +1152,15 @@ public class QueryUtils {
     				|| c=='|' || c=='+'
     				|| c=='-' || c=='*'
     				|| c=='/' || c=='%'
-    				|| c=='?' || c=='>'
+    				|| c=='_' || c=='>'
     	    		|| c=='<' || c=='!' )
     			sBuilder.append(c);
     	}    		
     	return sBuilder.toString();
-    }
+*/    }
     
     public static String replaceParamAsSqlString(String sql, String paramAlias,String paramSqlString){
-    	Lexer varMorp = new Lexer(sql,Lexer.NOTE_TYPE_SQL);
+    	Lexer varMorp = new Lexer(sql,Lexer.LANG_TYPE_SQL);
 
     	String sWord = varMorp.getAWord();
     	while( sWord!=null && ! sWord.equals("") ){
@@ -1170,7 +1198,7 @@ public class QueryUtils {
 	 */
 	public static QueryAndNamedParams translateQueryFilter(String filter,IFilterTranslater translater){
 		QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
-		Lexer varMorp = new Lexer(filter,Lexer.NOTE_TYPE_SQL);
+		Lexer varMorp = new Lexer(filter,Lexer.LANG_TYPE_SQL);
 		StringBuilder hqlPiece= new StringBuilder();
 		String sWord = varMorp.getAWord();
 		int prePos = 0;
@@ -1263,7 +1291,7 @@ public class QueryUtils {
 	public static QueryAndNamedParams translateQueryPiece(
 			String queryPiece,IFilterTranslater translater){
 
-		Lexer varMorp = new Lexer(queryPiece,Lexer.NOTE_TYPE_SQL);
+		Lexer varMorp = new Lexer(queryPiece,Lexer.LANG_TYPE_SQL);
 		String aWord = varMorp.getARawWord();
 		if(aWord==null || aWord.length() == 0)
 			return null;
@@ -1385,7 +1413,7 @@ public class QueryUtils {
 			boolean isUnion,IFilterTranslater translater){
 		
 		QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
-		Lexer varMorp = new Lexer(queryStatement,Lexer.NOTE_TYPE_SQL);
+		Lexer varMorp = new Lexer(queryStatement,Lexer.LANG_TYPE_SQL);
 		StringBuilder hqlBuilder= new StringBuilder();
 		String sWord = varMorp.getAWord();
 		int prePos = 0;
