@@ -109,7 +109,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		return sBuilder.toString();
 	}
 	
-	public static Pair<String,String[]> buildGetObjectSql(TableInfo ti){
+	public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti){
 		Pair<String,String[]> q = buildFieldSql(ti,null);
 		String filter = buildFilterSqlByPk(ti,null);
 		return new ImmutablePair<String,String[]>(
@@ -121,7 +121,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 	public JSONObject getObjectById(Object keyValue) throws SQLException, IOException {
 		if(tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()!=1)
 			return  null;
-		Pair<String,String[]> q = buildGetObjectSql(tableInfo);
+		Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
 		JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
 				 conn, q.getLeft(), 
 				 QueryUtils.createSqlParamsMap( tableInfo.getPkColumns().get(0),keyValue),
@@ -135,7 +135,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 	public JSONObject getObjectById(Map<String, Object> keyValues) throws SQLException, IOException {
 		if(tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()!=keyValues.size())
 			return  null;
-		Pair<String,String[]> q = buildGetObjectSql(tableInfo);
+		Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
 		JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
 				 conn, q.getLeft(), 
 				 keyValues,
@@ -160,6 +160,17 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		return (JSONObject) ja.get(0);
 	}
 
+	@Override
+	public JSONArray listObjectsByProperties(Map<String, Object> properties) throws SQLException, IOException {
+		Pair<String,String[]> q = buildFieldSql(tableInfo,null);
+		String filter = buildFilterSql(tableInfo,null,properties.keySet());
+		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
+				 conn,
+				 "select " + q.getLeft() +" from " +tableInfo.getTabName() + " where " + filter,
+				 properties,
+				 q.getRight());
+	}
+	
 	@Override
 	public JSONArray listObjectsByProperties(Map<String, Object> properties, int startPos, int maxSize)
 			throws SQLException, IOException {
@@ -191,6 +202,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		
 	}
 
+	@Override
+	public void updateObjectsByProperties(Map<String, Object> fieldValues, Map<String, Object> properties)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	@Override
 	public void deleteObjectById(Object keyValue) throws SQLException {
 		// TODO Auto-generated method stub
@@ -245,5 +263,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

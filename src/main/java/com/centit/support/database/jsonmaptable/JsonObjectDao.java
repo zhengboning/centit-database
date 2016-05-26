@@ -32,6 +32,15 @@ public interface JsonObjectDao {
 	public JSONObject getObjectByProperties(Map<String, Object> properties) throws SQLException, IOException;
 	
 	/**
+	 * 
+	 * @param properties
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public JSONArray listObjectsByProperties(Map<String, Object> properties) throws SQLException, IOException;
+	
+	/**
 	 * 根据属性进行查询
 	 * @param properties
 	 * @param startPos
@@ -58,6 +67,15 @@ public interface JsonObjectDao {
 	 * @param object
 	 */
 	public void mergeObject(JSONObject object) throws SQLException;
+	
+	/**
+	 * 根据条件批量更新 对象
+	 * @param fieldValues
+	 * @param properties
+	 * @throws SQLException
+	 */
+	public void updateObjectsByProperties(Map<String, Object> fieldValues,
+					Map<String, Object> properties) throws SQLException;
 	
 	/**
 	 * 删除，单主键
@@ -95,6 +113,7 @@ public interface JsonObjectDao {
 	 * @param properties
 	 */
 	public void deleteObjectsAsTabulation(Map<String, Object> properties) throws SQLException;
+	
 	
 	/**
 	 * 用新的列表覆盖数据库中的列表
