@@ -19,11 +19,11 @@ import com.centit.support.file.FileSystemOpt;
 
 public class TableInfo {
 	/**
-	 * 不包括主键
+	 * 包括主键
 	 */
 	private List<TableField> columns=null;
 	/**
-	 * 包括主键
+	 * 主键字段
 	 */
 	private List<String> pkColumns=null;
 	private String sSchema;
@@ -105,10 +105,29 @@ public class TableInfo {
 		}		
 	}
 	
+	/**
+	 * 根据字段名查找 字段信息
+	 * @param colname
+	 * @return
+	 */
 	public TableField findField(String colname){
 		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
 			TableField col = it.next();
 			if(col.getColumn().equals(colname))
+				return col;
+		}
+		return null;
+	}
+	
+	/**
+	 * 根据属性名查找 字段信息
+	 * @param colname
+	 * @return
+	 */
+	public TableField findFieldByName(String name){
+		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
+			TableField col = it.next();
+			if(col.getName().equals(name))
 				return col;
 		}
 		return null;
