@@ -9,7 +9,34 @@ import com.centit.support.database.QueryUtils;
 
 public class TestJDBC {
 	
-	public  static void  main(String[] args)   { 	
+	public  static void  main(String[] args)   {
+		 testJDBCMetadata();
+	}
+  
+	public  static void testJDBCMetadata(){
+		 DataSourceDescription dbc = new DataSourceDescription();	  
+		  dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
+		  dbc.setUsername("fdemo2");
+		  dbc.setPassword("fdemo2");
+		  try {
+			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+			JSONArray ja = DatabaseAccess.fetchResultSetToJSONArray(
+					conn.getMetaData().getTables(null, "FDEMO2","F_USER%", null) , null);			
+			System.out.println(ja.toJSONString());
+			
+			ja = DatabaseAccess.fetchResultSetToJSONArray(
+					conn.getMetaData().getColumns(null, "FDEMO2", "F_USERINFO", null), null);			
+			System.out.println(ja.toJSONString());
+			
+			conn.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    System.out.println("done!");
+	}
+	
+	public  static void testDataSource(){
 	  DataSourceDescription dbc = new DataSourceDescription();	  
 	  dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
 	  dbc.setUsername("fdemo2");

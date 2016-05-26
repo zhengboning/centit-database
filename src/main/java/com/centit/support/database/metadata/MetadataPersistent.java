@@ -5,14 +5,14 @@ import java.sql.PreparedStatement;
 
 import com.centit.support.database.DBConnect;
 
-public class MetadataAccess {
+public class MetadataPersistent {
 	/**
 	 * 这个方法暂时不需要实现，系统反向工程不需要通过元数据表来实现
 	 * @param tabName
 	 * @return
 	 */
 	private DBConnect dbc;
-	public TableMetadata loadTableMetadata(String tabName)
+	public TableInfo loadTableMetadata(String tabName)
 	{
 		return null;
 	}
@@ -25,7 +25,7 @@ public class MetadataAccess {
 	 * @param md 元数据记录，它最好是从PdmReader.getTableMetadata 返回的内容，
 	 * 						如果是从数据库的系统视图中获得的元数据内容可能不完整
 	 */
-	public void saveTableMetadata(TableMetadata md) {
+	public void saveTableMetadata(TableInfo md) {
 		String sTabCode = md.getTabName().toUpperCase();
 		PreparedStatement pStmt= null;
 		try {
@@ -74,7 +74,7 @@ public class MetadataAccess {
 			}
 			//保存表作为主表（父表）的关联信息
 			if(md.getReferences() !=null){
-				for(ReferenceMetadata ref : md.getReferences()){
+				for(TableReference ref : md.getReferences()){
 					//insert into F_MD_RELATION (RELCODE, RELNAME, PTABCODE, CTABCODE, RELSTATE, REFDESC) values 
 					try{
 						pStmt= conn.prepareStatement("insert into F_MD_RELATION (RELCODE, RELNAME, PTABCODE, CTABCODE, RELSTATE, REFDESC) "+

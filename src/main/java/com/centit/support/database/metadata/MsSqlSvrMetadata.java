@@ -8,7 +8,7 @@ import java.util.Iterator;
 import com.centit.support.database.DBConnect;
 
 
-public class MsSqlsvrDatabase implements Database {
+public class MsSqlSvrMetadata implements DatabaseMetadata {
 	private final static String sqlGetTabColumns=
 		"SELECT  a.name, c.name AS typename, a.length , a.xprec, a.xscale, isnullable "+
 		"FROM syscolumns a INNER JOIN "+
@@ -64,8 +64,8 @@ public class MsSqlsvrDatabase implements Database {
 		sDBSchema = schema;
 	}
 	
-	public TableMetadata getTableMetadata(String tabName) {
-		TableMetadata tab = new TableMetadata(tabName);
+	public TableInfo getTableMetadata(String tabName) {
+		TableInfo tab = new TableInfo(tabName);
 		int table_id=0,pk_ind_id=0;
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
@@ -120,7 +120,7 @@ public class MsSqlsvrDatabase implements Database {
 			pStmt.setInt(1, table_id);
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
-				ReferenceMetadata ref = new ReferenceMetadata();
+				TableReference ref = new TableReference();
 				//"select a.name,a.object_id,a.parent_object_id , b.name as tabname "+
 				ref.setTableName(rs.getString("tabname"));
 				ref.setReferenceCode(rs.getString("name"));
@@ -130,8 +130,8 @@ public class MsSqlsvrDatabase implements Database {
 			rs.close();
 			pStmt.close();
 			// get reference detail
-			for(Iterator<ReferenceMetadata> it= tab.getReferences().iterator();it.hasNext(); ){
-				ReferenceMetadata ref = it.next();
+			for(Iterator<TableReference> it= tab.getReferences().iterator();it.hasNext(); ){
+				TableReference ref = it.next();
 				pStmt= conn.prepareStatement(sqlFKColumns);
 				pStmt.setInt(1,ref.getObjectId());
 				rs = pStmt.executeQuery();

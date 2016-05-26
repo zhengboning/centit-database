@@ -14,8 +14,12 @@ import org.dom4j.io.SAXReader;
 
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 
-
-public class HibernateMetadata {
+/**
+ * 这个变量的属性没有和TableInfo一致起来，设计的时候有欠缺
+ * @author codefan
+ *
+ */
+public class HibernateMapinfo {
 	private String sClassName;
 	private String sTableName;
 	private String sTableDesc;
@@ -26,8 +30,8 @@ public class HibernateMetadata {
 	private boolean hasID;
 	private String sIdType;
 	private String sIdName;
-	private List<HibernateMetadata> one2manys;
-	private List<ReferenceMetadata> references;
+	private List<HibernateMapinfo> one2manys;
+	private List<TableReference> references;
 
 	public boolean isReferenceColumn(int refPos , String sCol) {
 		if(references==null || references.size() ==0 )
@@ -96,11 +100,11 @@ public class HibernateMetadata {
 		this.properties = properties;
 	}
 
-	public void setOne2manys(List<HibernateMetadata> one2manys) {
+	public void setOne2manys(List<HibernateMapinfo> one2manys) {
 		this.one2manys = one2manys;
 	}
 
-	public void setReferences(List<ReferenceMetadata> references) {
+	public void setReferences(List<TableReference> references) {
 		this.references = references;
 	}
 	
@@ -108,7 +112,7 @@ public class HibernateMetadata {
 		this.isMainTable = isMT;
 	}
 
-	public HibernateMetadata()
+	public HibernateMapinfo()
 	{
 		isMainTable = true;
 		hasID = false;
@@ -226,8 +230,8 @@ public class HibernateMetadata {
 				List<Element> setElements = (List<Element>) classNode.elements("set");
 				//List<Element> one2manyNodes = (List<Element>)setElement.elements("//one-to-many");
 				if(setElements != null && setElements.size()>0){
-					one2manys = new ArrayList<HibernateMetadata>();
-					references = new ArrayList<ReferenceMetadata>();
+					one2manys = new ArrayList<HibernateMapinfo>();
+					references = new ArrayList<TableReference>();
 					for(Element setElement : setElements){
 						Element one2manyNode = setElement.element("one-to-many");
 						String sSubClassName = one2manyNode.attributeValue("class");
@@ -236,12 +240,12 @@ public class HibernateMetadata {
 							sSubClassName = sSubClassName.substring(p+1);
 						}
 			            
-						HibernateMetadata one2many = new HibernateMetadata();
+						HibernateMapinfo one2many = new HibernateMapinfo();
 						one2many.setMainTable(false);
 						one2many.loadHibernateMetadata(sPath,sSubClassName+".hbm.xml");
 						one2manys.add(one2many);
 						
-						ReferenceMetadata ref = new ReferenceMetadata();
+						TableReference ref = new TableReference();
 						ref.setReferenceCode(setElement.attributeValue("name"));
 						Element keyElt = setElement.element("key");
 						List<Element> colElements = (List<Element>) keyElt.elements("column");
@@ -299,15 +303,15 @@ public class HibernateMetadata {
 		return keyProperties.get(indx);
 	}
 
-	public List<HibernateMetadata> getOne2manys() {
+	public List<HibernateMapinfo> getOne2manys() {
 		if(one2manys==null)
-			one2manys = new ArrayList<HibernateMetadata>();
+			one2manys = new ArrayList<HibernateMapinfo>();
 		return one2manys;
 	}
 	
-	public List<ReferenceMetadata> getReferences(){
+	public List<TableReference> getReferences(){
 		if(references==null)
-			references = new ArrayList<ReferenceMetadata>();
+			references = new ArrayList<TableReference>();
 		return references;
 	}
 

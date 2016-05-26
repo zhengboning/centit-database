@@ -3,7 +3,7 @@ package com.centit.support.database.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReferenceMetadata {
+public class TableReference {
 	
 	private List<TableField> fkcolumns;
 	private String  sTableName;

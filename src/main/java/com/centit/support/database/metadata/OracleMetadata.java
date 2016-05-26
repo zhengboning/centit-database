@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import com.centit.support.database.DBConnect;
 
-public class OracleDatabase implements Database {
+public class OracleMetadata implements DatabaseMetadata {
 	private final static String sqlGetTabColumns=
 		"select a.COLUMN_NAME,a.DATA_TYPE, a.DATA_LENGTH," +
 		   "nvl(a.DATA_PRECISION,a.DATA_LENGTH) as DATA_PRECISION,NVL(a.DATA_SCALE,0) as DATA_SCALE,a.NULLABLE " +
@@ -52,8 +52,8 @@ public class OracleDatabase implements Database {
 		sDBSchema = schema;
 	}
 	
-	public TableMetadata getTableMetadata(String tabName) {
-		TableMetadata tab = new TableMetadata(tabName);
+	public TableInfo getTableMetadata(String tabName) {
+		TableInfo tab = new TableInfo(tabName);
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
 		
@@ -102,7 +102,7 @@ public class OracleDatabase implements Database {
 			pStmt.setString(1, tab.getPkName());
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
-				ReferenceMetadata ref = new ReferenceMetadata();
+				TableReference ref = new TableReference();
 				ref.setTableName(rs.getString("TABLE_NAME"));
 				ref.setReferenceCode(rs.getString("CONSTRAINT_NAME"));
 				tab.getReferences().add(ref );
@@ -110,8 +110,8 @@ public class OracleDatabase implements Database {
 			rs.close();
 			pStmt.close();
 			// get reference detail
-			for(Iterator<ReferenceMetadata> it= tab.getReferences().iterator();it.hasNext(); ){
-				ReferenceMetadata ref = it.next();
+			for(Iterator<TableReference> it= tab.getReferences().iterator();it.hasNext(); ){
+				TableReference ref = it.next();
 				pStmt= conn.prepareStatement(sqlFKColumns);
 				pStmt.setString(1,ref.getReferenceCode());
 				rs = pStmt.executeQuery();

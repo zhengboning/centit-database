@@ -2,9 +2,9 @@ package com.centit.support.database.metadata;
 
 public class TableField {
 	private String sName;// 字段属性名称 
-	private String sDesc;// 字段的中文名称，PDM中的 DESC 和元数据表格中的Name对应
-	private String sType;
-	private String sDBType;
+	private String sDesc;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
+	private String sType;// 类型
+	private String sDBType;// 数据库中的字段类型
 	private String sColumn;// 字段代码 PDM中的CODE
 	private String sComment;// 字段注释
 	private boolean bNotNull;

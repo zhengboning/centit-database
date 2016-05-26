@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import com.centit.support.database.DBConnect;
 
-public class IbmDb2Database implements Database {
+public class IbmDb2Metadata implements DatabaseMetadata {
 	
 
 	private final static String sqlGetTabColumns=
@@ -50,8 +50,8 @@ public class IbmDb2Database implements Database {
 			sDBSchema = schema.toUpperCase();
 	}
 
-	public TableMetadata getTableMetadata(String tabName) {
-		TableMetadata tab = new TableMetadata(tabName);
+	public TableInfo getTableMetadata(String tabName) {
+		TableInfo tab = new TableInfo(tabName);
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
 		try {
@@ -93,7 +93,7 @@ public class IbmDb2Database implements Database {
 			pStmt.setString(1, tab.getPkName());
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
-				ReferenceMetadata ref = new ReferenceMetadata();
+				TableReference ref = new TableReference();
 				ref.setTableName(rs.getString("tbname"));
 				ref.setReferenceCode(rs.getString("relname"));
 				int nColCount = rs.getInt("colcount");
@@ -112,8 +112,8 @@ public class IbmDb2Database implements Database {
 			rs.close();
 			pStmt.close();
 			// get reference detail
-			for(Iterator<ReferenceMetadata> it= tab.getReferences().iterator();it.hasNext(); ){
-				ReferenceMetadata ref = it.next();
+			for(Iterator<TableReference> it= tab.getReferences().iterator();it.hasNext(); ){
+				TableReference ref = it.next();
 				for(Iterator<TableField> it2= ref.getFkcolumns().iterator();it2.hasNext(); ){
 					TableField field = it2.next();
 					pStmt= conn.prepareStatement(sqlFKColumn);

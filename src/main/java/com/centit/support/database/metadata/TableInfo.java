@@ -17,9 +17,14 @@ import org.dom4j.io.XMLWriter;
 
 import com.centit.support.file.FileSystemOpt;
 
-public class TableMetadata {
-	
+public class TableInfo {
+	/**
+	 * 不包括主键
+	 */
 	private List<TableField> columns=null;
+	/**
+	 * 包括主键
+	 */
 	private List<String> pkColumns=null;
 	private String sSchema;
 
@@ -28,7 +33,7 @@ public class TableMetadata {
 	private String sTabDesc;// 表的 描述，中文名称
 	private String sTabComment;// 表的备注信息 
 	private String sPkName;
-	private List<ReferenceMetadata> references=null;
+	private List<TableReference> references=null;
 	private String sPackageName;
 	
 	/**
@@ -120,12 +125,12 @@ public class TableMetadata {
 		return false;
 	}
 	
-	public TableMetadata()
+	public TableInfo()
 	{
 		
 	}
 	
-	public TableMetadata(String tabname)
+	public TableInfo(String tabname)
 	{
 		setTabName(tabname);
 	}
@@ -257,8 +262,8 @@ public class TableMetadata {
 			}
 		}
 		if(references !=null){
-			for(Iterator<ReferenceMetadata> it = references.iterator();it.hasNext();){
-				ReferenceMetadata ref = it.next();
+			for(Iterator<TableReference> it = references.iterator();it.hasNext();){
+				TableReference ref = it.next();
 				Element setElt = classElt.addElement("set");
 				setElt.addAttribute("name", TableField.mapPropName(ref.getTableName())+'s');
 				setElt.addAttribute("cascade", "all-delete-orphan");//"all-delete-orphan")//save-update,delete;
@@ -303,13 +308,13 @@ public class TableMetadata {
 				sClassName.substring(1);	
 	}
 
-	public List<ReferenceMetadata> getReferences() {
+	public List<TableReference> getReferences() {
 		if(references==null)
-			references = new ArrayList<ReferenceMetadata>();
+			references = new ArrayList<TableReference>();
 		return references;
 	}
 
-	public void setReferences(List<ReferenceMetadata> references) {
+	public void setReferences(List<TableReference> references) {
 		this.references = references;
 	}
 }

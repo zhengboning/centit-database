@@ -18,7 +18,7 @@ import org.dom4j.io.SAXReader;
 import com.centit.support.database.DBConnect;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 
-public class PdmReader implements Database {
+public class PdmReader implements DatabaseMetadata {
 	private Document doc=null;
 	private String sDBSchema= null;
 	private List<String> pkColumnIDs;
@@ -104,11 +104,11 @@ public class PdmReader implements Database {
 
 	
 	@SuppressWarnings("unchecked")
-	public TableMetadata getTableMetadata(String tabName) {
+	public TableInfo getTableMetadata(String tabName) {
 		pkColumnIDs = new ArrayList<String>();
 		if (doc==null)
 			return null;
-		TableMetadata tab = new TableMetadata(tabName.toUpperCase());
+		TableInfo tab = new TableInfo(tabName.toUpperCase());
 		if(sDBSchema!=null)
 			tab.setSchema(sDBSchema);
 			
@@ -176,7 +176,7 @@ public class PdmReader implements Database {
 		//获取所有的外键
 		List<Element> elReferences = (List<Element>) doc.selectNodes("//c:References/o:Reference[c:ParentKey/o:Key/@Ref='"+sPkID+"']");
 		for(Element elRef:elReferences){
-			ReferenceMetadata ref = new ReferenceMetadata();
+			TableReference ref = new TableReference();
 			ref.setReferenceCode(elRef.attributeValue("Id"));  //getElementText(elRef,"a","Code"));
 			ref.setReferenceName(getElementText(elRef,"a","Name"));
 			
@@ -236,9 +236,9 @@ public class PdmReader implements Database {
 		return tab;
 	}
 
-	public HibernateMetadata toHibernateMetadata(TableMetadata tableMeta){
+	public HibernateMapinfo toHibernateMetadata(TableInfo tableMeta){
 		
-		HibernateMetadata hibernateMeta = new HibernateMetadata();		
+		HibernateMapinfo hibernateMeta = new HibernateMapinfo();		
 		hibernateMeta.setClassName(tableMeta.getPackageName()+'.'+tableMeta.getClassName());
 		hibernateMeta.setTableName(tableMeta.getTabName().toUpperCase());
 		hibernateMeta.setTableDesc(tableMeta.getTabDesc());
@@ -267,18 +267,18 @@ public class PdmReader implements Database {
 		return hibernateMeta;
 	}
 	
-	public HibernateMetadata getHibernateMetadata(String tabName,String sPackageName) {
-		TableMetadata tabMeta = this.getTableMetadata(tabName);
+	public HibernateMapinfo getHibernateMetadata(String tabName,String sPackageName) {
+		TableInfo tabMeta = this.getTableMetadata(tabName);
 		if(tabMeta==null)
 			return null;
 		tabMeta.setPackageName(sPackageName);
-		HibernateMetadata tab = toHibernateMetadata(tabMeta );
-		for(ReferenceMetadata ref :tab.getReferences()){
+		HibernateMapinfo tab = toHibernateMetadata(tabMeta );
+		for(TableReference ref :tab.getReferences()){
 			
-			TableMetadata subTabMeta = this.getTableMetadata(ref.getTableName());
+			TableInfo subTabMeta = this.getTableMetadata(ref.getTableName());
 			subTabMeta.setPackageName(sPackageName);
 			
-			HibernateMetadata subTab =
+			HibernateMapinfo subTab =
 					toHibernateMetadata(subTabMeta);
 			
 			subTab.setMainTable(false);
