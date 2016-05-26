@@ -21,7 +21,7 @@ public class TestJDBC {
 		  try {
 			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
 			JSONArray ja = DatabaseAccess.fetchResultSetToJSONArray(
-					conn.getMetaData().getTables(null, "FDEMO2","F_USER%", null) , null);			
+					conn.getMetaData().getTables(null, "FDEMO2","F_USERINFO", null) , null);			
 			System.out.println(ja.toJSONString());
 			
 			ja = DatabaseAccess.fetchResultSetToJSONArray(

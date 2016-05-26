@@ -19,7 +19,7 @@ import com.centit.support.xml.IgnoreDTDEntityResolver;
  * @author codefan
  *
  */
-public class HibernateMapinfo {
+public class HibernateMapInfo {
 	private String sClassName;
 	private String sTableName;
 	private String sTableDesc;
@@ -30,7 +30,7 @@ public class HibernateMapinfo {
 	private boolean hasID;
 	private String sIdType;
 	private String sIdName;
-	private List<HibernateMapinfo> one2manys;
+	private List<HibernateMapInfo> one2manys;
 	private List<TableReference> references;
 
 	public boolean isReferenceColumn(int refPos , String sCol) {
@@ -100,7 +100,7 @@ public class HibernateMapinfo {
 		this.properties = properties;
 	}
 
-	public void setOne2manys(List<HibernateMapinfo> one2manys) {
+	public void setOne2manys(List<HibernateMapInfo> one2manys) {
 		this.one2manys = one2manys;
 	}
 
@@ -112,7 +112,7 @@ public class HibernateMapinfo {
 		this.isMainTable = isMT;
 	}
 
-	public HibernateMapinfo()
+	public HibernateMapInfo()
 	{
 		isMainTable = true;
 		hasID = false;
@@ -230,7 +230,7 @@ public class HibernateMapinfo {
 				List<Element> setElements = (List<Element>) classNode.elements("set");
 				//List<Element> one2manyNodes = (List<Element>)setElement.elements("//one-to-many");
 				if(setElements != null && setElements.size()>0){
-					one2manys = new ArrayList<HibernateMapinfo>();
+					one2manys = new ArrayList<HibernateMapInfo>();
 					references = new ArrayList<TableReference>();
 					for(Element setElement : setElements){
 						Element one2manyNode = setElement.element("one-to-many");
@@ -240,7 +240,7 @@ public class HibernateMapinfo {
 							sSubClassName = sSubClassName.substring(p+1);
 						}
 			            
-						HibernateMapinfo one2many = new HibernateMapinfo();
+						HibernateMapInfo one2many = new HibernateMapInfo();
 						one2many.setMainTable(false);
 						one2many.loadHibernateMetadata(sPath,sSubClassName+".hbm.xml");
 						one2manys.add(one2many);
@@ -303,9 +303,9 @@ public class HibernateMapinfo {
 		return keyProperties.get(indx);
 	}
 
-	public List<HibernateMapinfo> getOne2manys() {
+	public List<HibernateMapInfo> getOne2manys() {
 		if(one2manys==null)
-			one2manys = new ArrayList<HibernateMapinfo>();
+			one2manys = new ArrayList<HibernateMapInfo>();
 		return one2manys;
 	}
 	

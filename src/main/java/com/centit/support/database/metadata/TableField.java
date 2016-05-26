@@ -12,10 +12,10 @@ public class TableField {
 	private int  nPrecision;//有效数据位数 Only used when sType=Long Number Float
 	private int  nScale;//精度 Only used when sType= Long Number Float
 	
-	public static String mapPropName(String sDBName){
-		String sTempName = sDBName.toLowerCase();
-		String sTemp2Name = sDBName.toUpperCase();
-		int nl = sDBName.length();
+	public static String mapPropName(String dbObjectName){
+		String sTempName = dbObjectName.toLowerCase();
+		String sTemp2Name = dbObjectName.toUpperCase();
+		int nl = dbObjectName.length();
 		if(nl<3)
 			return sTempName;
 		int i=0;
@@ -71,6 +71,7 @@ public class TableField {
 		}else
 			sType = sDBType;
 	}
+	
 	public String getHibernateType(){
 		if(sType !=null && ( sType.equals("Date")|| sType.equals("Timestamp")))
 			return "java.util."+sType;
@@ -216,5 +217,4 @@ public class TableField {
 				sDBType = sDBType.substring(0,nPos);
 		}
 	}
-
 }

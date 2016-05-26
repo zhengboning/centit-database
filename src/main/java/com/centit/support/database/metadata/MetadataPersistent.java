@@ -14,6 +14,7 @@ public class MetadataPersistent {
 	private DBConnect dbc;
 	public TableInfo loadTableMetadata(String tabName)
 	{
+		//TODO load table metadata
 		return null;
 	}
 	

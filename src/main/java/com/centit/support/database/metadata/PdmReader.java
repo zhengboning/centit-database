@@ -236,9 +236,9 @@ public class PdmReader implements DatabaseMetadata {
 		return tab;
 	}
 
-	public HibernateMapinfo toHibernateMetadata(TableInfo tableMeta){
+	public HibernateMapInfo toHibernateMetadata(TableInfo tableMeta){
 		
-		HibernateMapinfo hibernateMeta = new HibernateMapinfo();		
+		HibernateMapInfo hibernateMeta = new HibernateMapInfo();		
 		hibernateMeta.setClassName(tableMeta.getPackageName()+'.'+tableMeta.getClassName());
 		hibernateMeta.setTableName(tableMeta.getTabName().toUpperCase());
 		hibernateMeta.setTableDesc(tableMeta.getTabDesc());
@@ -267,18 +267,18 @@ public class PdmReader implements DatabaseMetadata {
 		return hibernateMeta;
 	}
 	
-	public HibernateMapinfo getHibernateMetadata(String tabName,String sPackageName) {
+	public HibernateMapInfo getHibernateMetadata(String tabName,String sPackageName) {
 		TableInfo tabMeta = this.getTableMetadata(tabName);
 		if(tabMeta==null)
 			return null;
 		tabMeta.setPackageName(sPackageName);
-		HibernateMapinfo tab = toHibernateMetadata(tabMeta );
+		HibernateMapInfo tab = toHibernateMetadata(tabMeta );
 		for(TableReference ref :tab.getReferences()){
 			
 			TableInfo subTabMeta = this.getTableMetadata(ref.getTableName());
 			subTabMeta.setPackageName(sPackageName);
 			
-			HibernateMapinfo subTab =
+			HibernateMapInfo subTab =
 					toHibernateMetadata(subTabMeta);
 			
 			subTab.setMainTable(false);
