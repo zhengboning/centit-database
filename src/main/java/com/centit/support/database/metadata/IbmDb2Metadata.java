@@ -56,7 +56,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 		ResultSet rs = null;
 		try {
 			Connection conn = dbc.getConn();
-			tab.setSchema( dbc.getDbSchema().toUpperCase());
+			tab.setSchema( dbc.getSchema().toUpperCase());
 			// get columns
 			pStmt= conn.prepareStatement(sqlGetTabColumns);
 			pStmt.setString(1, sDBSchema);

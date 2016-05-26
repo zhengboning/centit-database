@@ -45,8 +45,10 @@ public class DbcpConnectPools {
         } catch (SQLException e) {  
             e.printStackTrace();
             return null;
-        }  
-        return new DbcpConnect(dsDesc.getUsername(),dsDesc.getDbType(), conn);		
+        }
+
+        return new DbcpConnect(
+        		dsDesc.getDatabaseCode(),dsDesc.getUsername(),dsDesc.getDbType(), conn);
 	}
 	
 	/** 获得数据源连接状态 */  

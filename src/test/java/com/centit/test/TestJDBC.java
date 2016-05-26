@@ -27,7 +27,9 @@ public class TestJDBC {
 			ja = DatabaseAccess.fetchResultSetToJSONArray(
 					conn.getMetaData().getColumns(null, "FDEMO2", "F_USERINFO", null), null);			
 			System.out.println(ja.toJSONString());
-			
+						
+			System.out.println(conn.getMetaData().getDatabaseProductName());
+			System.out.println(conn.getMetaData().getDriverName());
 			conn.close();
 			
 		} catch (Exception e) {

@@ -26,6 +26,8 @@ import java.util.concurrent.Executor;
  *
  */
 public class DbcpConnect implements DBConnect {
+	
+	private String databaseCode;
 
 	private String dbSchema;
 	
@@ -37,6 +39,13 @@ public class DbcpConnect implements DBConnect {
 	}
 	
 	public DbcpConnect(String dbSchema,DBType dbType,Connection conn){
+		this.dbSchema = dbSchema;
+		this.dbType = dbType;
+		this.conn = conn;
+	}
+	
+	public DbcpConnect(String databaseCode,String dbSchema,DBType dbType,Connection conn){
+		this.databaseCode = databaseCode;
 		this.dbSchema = dbSchema;
 		this.dbType = dbType;
 		this.conn = conn;
@@ -340,6 +349,15 @@ public class DbcpConnect implements DBConnect {
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		return conn.isWrapperFor(iface);
+	}
+
+	@Override
+	public String getDatabaseCode() {
+		return databaseCode;
+	}
+
+	public void setDatabaseCode(String databaseCode) {
+		this.databaseCode = databaseCode;
 	}
 
 }

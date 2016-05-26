@@ -30,6 +30,15 @@ public final class DataSourceDescription implements  Serializable{
 	private int    minIdle ;
 	private int    maxWaitMillis;
 	private int    initialSize ;
+	private String databaseCode;
+	
+	public String getDatabaseCode() {
+		return databaseCode;
+	}
+
+	public void setDatabaseCode(String databaseCode) {
+		this.databaseCode = databaseCode;
+	}
 	
 	public DataSourceDescription(){
 		this.maxTotal  = 10;
