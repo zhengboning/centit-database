@@ -1,5 +1,8 @@
 package com.centit.support.database.metadata;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import com.centit.support.database.DBConnect;
 
 public class JdbcMetadata implements DatabaseMetadata {
@@ -18,6 +21,12 @@ public class JdbcMetadata implements DatabaseMetadata {
 		//  "TABLE_SCHEM":"FDEMO2","BUFFER_LENGTH":0,"NULLABLE":0,"IS_NULLABLE":"NO",
 		//  "SQL_DATA_TYPE":0,"NUM_PREC_RADIX":10,"COLUMN_SIZE":32,"TYPE_NAME":"VARCHAR2",
 		//  "IS_AUTOINCREMENT":"NO","COLUMN_NAME":"USERCODE","ORDINAL_POSITION":1,"DATA_TYPE":12}
+		try {
+			ResultSet rs = dbc.getMetaData().getTables(null, dbc.getSchema(), tabName, null);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 

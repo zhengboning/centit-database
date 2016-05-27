@@ -174,7 +174,8 @@ public class DatabaseAccess {
 			if (i < asFn)
 				fieldNames[i] = fieldnames[i];
 			else
-				fieldNames[i] = rs.getMetaData().getColumnLabel(i + 1);
+				fieldNames[i] = mapColumnNameToField(
+						rs.getMetaData().getColumnLabel(i + 1));
 		}
 
 		while (rs.next()) {
@@ -194,6 +195,46 @@ public class DatabaseAccess {
 		return ja;
 	}
 
+	public static String mapColumnNameToField(String colName){
+		if(colName.indexOf('_')>=0){
+			int nl = colName.length();
+			char [] ch = colName.toCharArray();
+			int i=0 , j=0;
+			while(i<nl){
+				if(ch[i]=='_'){
+					i++;
+					while(i<nl && ch[i]=='_'){
+						ch[j] = '_';
+						i++;
+						j++;
+					}
+					if(i<nl){
+						ch[j] = Character.toUpperCase(ch[i]);
+						i++;
+						j++;
+					}
+				}else{
+					ch[j] = Character.toLowerCase(ch[i]);
+					i++;
+					j++;
+				}
+			}			
+			return String.valueOf(ch,0,j);
+		}else if(colName.charAt(0)>='A' && colName.charAt(0)<='Z'){
+			return colName.toLowerCase();
+		}else {
+			return colName;
+		}
+	}
+	
+	public static String[] mapColumnsNameToFields(List<String> colNames){
+		if(colNames==null || colNames.size()==0)
+			return null;
+		String[] fns = new String[colNames.size()];
+		for(int i=0;i<colNames.size();i++)
+			fns[i] = mapColumnNameToField(colNames.get(i));
+		return fns;
+	}
 	/**
 	 * 
 	 * @param Connection
@@ -219,11 +260,8 @@ public class DatabaseAccess {
 		
 		String[] fns = fieldnames;
 		if(ArrayUtils.isEmpty(fns)){
-			List<String> fields = QueryUtils.getSqlFiledNames(sSql);			
-			if(fields!=null && fields.size()>0){
-				fns = new String[fields.size()];
-				fns = fields.toArray(fns);
-			}
+			List<String> fields = QueryUtils.getSqlFiledNames(sSql);
+			fns = mapColumnsNameToFields(fields);
 		}
 		JSONArray ja = fetchResultSetToJSONArray(rs, fns);
 		
@@ -636,10 +674,7 @@ public class DatabaseAccess {
 		String[] fns = fieldnames;
 		if(ArrayUtils.isEmpty(fns)){
 			List<String> fields = QueryUtils.getSqlFiledNames(sSql);			
-			if(fields!=null && fields.size()>0){
-				fns = new String[fields.size()];
-				fns = fields.toArray(fns);
-			}
+			fns = mapColumnsNameToFields(fields);
 		}		
 		JSONArray ja = fetchResultSetToJSONArray(rs, fns);
 

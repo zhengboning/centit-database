@@ -7,14 +7,16 @@ import java.util.Map;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.KeyValuePair;
+import com.centit.support.database.DatabaseAccess;
 import com.centit.support.database.QueryAndNamedParams;
 import com.centit.support.database.QueryUtils;
 
 public class TestQueryUtils {
 	
 	public static void main(String[] args) {
+		System.out.println(DatabaseAccess.mapColumnNameToField("Hello_World")+"!");
 		//System.out.println(QueryUtils.getMatchString("hell%%'%'%wo'rd n__n"));
-		testTranslateQuery2();//testTemplate();
+		//testTranslateQuery2();//testTemplate();
 		//CodeRepositoryUtil.loadExtendedSqlMap("D:/Projects/framework2.1/framework-sys-module2.1/src/main/resources/ExtendedSqlMap.xml");
 		//System.out.println(CodeRepositoryUtil.getExtendedSql("QUERY_ID_1"));
 	}
