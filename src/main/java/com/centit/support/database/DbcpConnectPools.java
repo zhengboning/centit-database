@@ -46,9 +46,9 @@ public class DbcpConnectPools {
             e.printStackTrace();
             return null;
         }
-
+        ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
         return new DbcpConnect(
-        		dsDesc.getDatabaseCode(),dsDesc.getUsername(),dsDesc.getDbType(), conn);
+        		dsDesc.getDatabaseCode(),conn);
 	}
 	
 	/** 获得数据源连接状态 */  

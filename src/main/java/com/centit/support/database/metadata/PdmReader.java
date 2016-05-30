@@ -240,7 +240,7 @@ public class PdmReader implements DatabaseMetadata {
 		
 		HibernateMapInfo hibernateMeta = new HibernateMapInfo();		
 		hibernateMeta.setClassName(tableMeta.getPackageName()+'.'+tableMeta.getClassName());
-		hibernateMeta.setTableName(tableMeta.getTabName().toUpperCase());
+		hibernateMeta.setTableName(tableMeta.getTableName().toUpperCase());
 		hibernateMeta.setTableLabelName(tableMeta.getTableLableName());
 		hibernateMeta.setTableComment(tableMeta.getTableComment());
 		hibernateMeta.setMainTable(true);

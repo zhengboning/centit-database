@@ -37,7 +37,7 @@ public class MySqlJsonObjectDao extends GeneralJsonObjectDao {
 		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
 					getConnect(),
 					QueryUtils.buildMySqlLimitQuerySQL(
-							"select " + q.getLeft() +" from " +tableInfo.getTabName() + " where " + filter,
+							"select " + q.getLeft() +" from " +tableInfo.getTableName() + " where " + filter,
 							startPos, maxSize, false),
 				 properties,
 				 q.getRight());

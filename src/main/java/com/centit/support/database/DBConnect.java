@@ -11,9 +11,7 @@ public interface DBConnect extends Connection {
 	
 	public String getDatabaseCode(); 
 	
-	public String getDbSchema();
-	
-	public DBType getDbType();
+	public DBType getDatabaseType();
 	
 	public Connection getConn();
 }

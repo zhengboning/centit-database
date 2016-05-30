@@ -69,7 +69,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 				field.setMaxLength(rs.getInt("length"));
 				field.setPrecision(field.getMaxLength());
 				field.setScale(rs.getInt("scale"));
-				field.setMandatory(rs.getString("nulls"));
+				field.setNullEnable(rs.getString("nulls"));
 				field.mapToMetadata();
 		
 				tab.getColumns().add(field);
@@ -126,7 +126,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 						field.setMaxLength(rs.getInt("length"));
 						field.setPrecision(field.getMaxLength());
 						field.setScale(rs.getInt("scale"));
-						field.setMandatory(rs.getString("nulls"));
+						field.setNullEnable(rs.getString("nulls"));
 						field.mapToMetadata();
 					}
 					rs.close();

@@ -37,7 +37,7 @@ public class OracleJsonObjectDao extends GeneralJsonObjectDao {
 		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
 					getConnect(),
 					QueryUtils.buildOracleLimitQuerySQL(
-							"select " + q.getLeft() +" from " +tableInfo.getTabName() + " where " + filter,
+							"select " + q.getLeft() +" from " +tableInfo.getTableName() + " where " + filter,
 							startPos, maxSize, false),
 				 properties,
 				 q.getRight());

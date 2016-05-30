@@ -84,7 +84,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 				field.setMaxLength(rs.getInt("length"));
 				field.setPrecision(rs.getInt("xprec"));
 				field.setScale(rs.getInt("xscale"));
-				field.setMandatory(rs.getString("isnullable"));
+				field.setNullEnable(rs.getString("isnullable"));
 				field.mapToMetadata();
 				
 				tab.getColumns().add(field);
@@ -143,7 +143,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 					field.setMaxLength(rs.getInt("length"));
 					field.setPrecision(rs.getInt("xprec"));
 					field.setScale(rs.getInt("xscale"));
-					field.setMandatory(rs.getString("isnullable"));
+					field.setNullEnable(rs.getString("isnullable"));
 					field.mapToMetadata();
 					
 					ref.getFkcolumns().add(field);

@@ -39,12 +39,12 @@ public class TableInfo {
 	/**
 	 * 数据库表名，对应pdm中的code，对应元数据中的 tabcode
 	 */
-	public String getTabName() {
+	public String getTableName() {
 		return tableName;
 		
 	}
 	
-	public void setTabName(String tabName) {
+	public void setTableName(String tabName) {
 		tableName = tabName;
 
 	}	
@@ -175,7 +175,7 @@ public class TableInfo {
 	
 	public TableInfo(String tabname)
 	{
-		setTabName(tabname);
+		setTableName(tabname);
 	}
 	
 	private void saveProperty(TableField field,Element propElt,boolean keyProp){

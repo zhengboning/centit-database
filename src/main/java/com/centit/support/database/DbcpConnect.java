@@ -28,49 +28,33 @@ import java.util.concurrent.Executor;
 public class DbcpConnect implements DBConnect {
 	
 	private String databaseCode;
-
-	private String dbSchema;
-	
-	private DBType dbType;
 	
 	private Connection conn;
 	
 	public DbcpConnect(){
 	}
 	
-	public DbcpConnect(String dbSchema,DBType dbType,Connection conn){
-		this.dbSchema = dbSchema;
-		this.dbType = dbType;
+	public DbcpConnect(Connection conn){
 		this.conn = conn;
 	}
 	
-	public DbcpConnect(String databaseCode,String dbSchema,DBType dbType,Connection conn){
+	public DbcpConnect(String databaseCode,Connection conn){
 		this.databaseCode = databaseCode;
-		this.dbSchema = dbSchema;
-		this.dbType = dbType;
 		this.conn = conn;
-	}
-	
-	public void setDbSchema(String dbSchema) {
-		this.dbSchema = dbSchema;
-	}
-
-	public void setDbType(DBType dbType) {
-		this.dbType = dbType;
 	}
 
 	public void setConn(Connection conn) {
 		this.conn = conn;
 	}
 
-	@Override
-	public String getDbSchema() {
-		return this.dbSchema;
-	}
 
 	@Override
-	public DBType getDbType() {
-		return this.dbType;
+	public DBType getDatabaseType() {
+		try {
+			return DBType.mapDBType(this.conn.getMetaData().getURL());
+		} catch (SQLException e) {
+			return DBType.Unknown;
+		}
 	}
 
 	@Override

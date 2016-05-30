@@ -749,7 +749,7 @@ public class DatabaseAccess {
 		int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
 		
 		String query;
-		switch(conn.getDbType()){
+		switch(conn.getDatabaseType()){
 		case Oracle:
 			query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
 			break;
@@ -793,7 +793,7 @@ public class DatabaseAccess {
 		int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
 		
 		String query;
-		switch(conn.getDbType()){
+		switch(conn.getDatabaseType()){
 		case Oracle:
 			query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
 			break;

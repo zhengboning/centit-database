@@ -66,7 +66,7 @@ public interface JsonObjectDao {
 	 * 合并
 	 * @param object
 	 */
-	public void mergeObject( Map<String, Object> object) throws SQLException;
+	public void mergeObject( Map<String, Object> object) throws SQLException, IOException;
 	
 	/**
 	 * 根据条件批量更新 对象
@@ -88,7 +88,13 @@ public interface JsonObjectDao {
 	 * @param keyValue
 	 */
 	public void deleteObjectById(Map<String,Object> keyValue) throws SQLException;
-	
+	/**
+	 * 根据属性 批量删除
+	 * @param properties
+	 * @throws SQLException
+	 */
+	public void deleteObjectsByProperties(Map<String, Object> properties)
+			throws SQLException;
 	//--- 作为子表批量操作
 	/**
 	 * 批量添加多条记录
@@ -121,7 +127,7 @@ public interface JsonObjectDao {
 	 * @param newObjects
 	 * @return
 	 */
-	public void replaceObjectsAsTabulation(JSONArray newObjects,JSONArray dbObjects) throws SQLException, IOException;
+	public void replaceObjectsAsTabulation(JSONArray newObjects,JSONArray dbObjects) throws SQLException;
 	/**
 	 * 用新的列表覆盖数据库中的内容，通过单外键查询列表
 	 * @param newObjects

@@ -163,7 +163,13 @@ public class TableField {
 		mandatory = 
 			("true".equalsIgnoreCase(notnull) ||
 					"1".equalsIgnoreCase(notnull));
-	}	
+	}
+	
+	public void setNullEnable(String nullEnable) {
+		mandatory = 
+				("N".equalsIgnoreCase(nullEnable) ||
+						"0".equalsIgnoreCase(nullEnable));
+	}
 	
 	/**
 	 * 最大长度 Only used when sType=String

@@ -37,7 +37,7 @@ public class DB2JsonObjectDao extends GeneralJsonObjectDao {
 		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
 					getConnect(),
 					QueryUtils.buildDB2LimitQuerySQL(
-							"select " + q.getLeft() +" from " +tableInfo.getTabName() + " where " + filter,
+							"select " + q.getLeft() +" from " +tableInfo.getTableName() + " where " + filter,
 							startPos, maxSize),
 				 properties,
 				 q.getRight());
