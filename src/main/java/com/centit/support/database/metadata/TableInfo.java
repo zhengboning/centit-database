@@ -26,72 +26,72 @@ public class TableInfo {
 	 * 主键字段
 	 */
 	private List<String> pkColumns=null;
-	private String sSchema;
+	private String schema;
 
-	private String sTabName;// 其实是table 代码 code
+	private String tableName;// 其实是table 代码 code
 	//private String sClassName;//表对应的类名 同时作为业务模块名
-	private String sTabDesc;// 表的 描述，中文名称
-	private String sTabComment;// 表的备注信息 
-	private String sPkName;
+	private String tableLabelName;// 表的 描述，中文名称
+	private String tableComment;// 表的备注信息 
+	private String pkName;
 	private List<TableReference> references=null;
-	private String sPackageName;
+	private String packageName;
 	
 	/**
 	 * 数据库表名，对应pdm中的code，对应元数据中的 tabcode
 	 */
 	public String getTabName() {
-		return sTabName;
+		return tableName;
 		
 	}
 	
 	public void setTabName(String tabName) {
-		sTabName = tabName;
+		tableName = tabName;
 
 	}	
 	
 	/**
 	 * 数据库表中文名，对应pdm中的name,对应元数据中的 tabname
 	 */
-	public String getTabDesc() {
-		return sTabDesc;
+	public String getTableLableName() {
+		return tableLabelName;
 	}
 
-	public void setTabDesc(String tabDesc) {
-		this.sTabDesc = tabDesc;
+	public void setTableLableName(String tabDesc) {
+		this.tableLabelName = tabDesc;
 	}
 
 	/**
 	 * 数据库表备注信息，对应pdm中的Comment,对应元数据中的 tabdesc
 	 */
-	public String getTabComment() {
-		return sTabComment;
+	public String getTableComment() {
+		return tableComment;
 	}
 
-	public void setTabComment(String tabComment) {
-		this.sTabComment = tabComment;
+	public void setTableComment(String tabComment) {
+		this.tableComment = tabComment;
 	}
 
 	public String getPkName() {
-		return sPkName;
+		return pkName;
 	}
 
 	public void setPkName(String pkName) {
-		sPkName = pkName;
+		this.pkName = pkName;
 	}	
 	public String getPackageName() {
-		return sPackageName;
+		return packageName;
 	}
 
 	public void setPackageName(String packageName) {
-		sPackageName = packageName;
+		this.packageName = packageName;
 	}
 
 	public String getSchema() {
-		return sSchema;
+		return schema;
 	}
 
 	public void setSchema(String schema) {
-		sSchema = schema;
+		this.schema = schema;
 	}	
 	protected static void writerXMLFile(Document doc, String xmlFile){
 		XMLWriter output;
@@ -113,7 +113,7 @@ public class TableInfo {
 	public TableField findField(String colname){
 		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
 			TableField col = it.next();
-			if(col.getColumn().equals(colname))
+			if(col.getColumnName().equals(colname))
 				return col;
 		}
 		return null;
@@ -127,7 +127,31 @@ public class TableInfo {
 	public TableField findFieldByName(String name){
 		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
 			TableField col = it.next();
-			if(col.getName().equals(name))
+			if(col.getPropertyName().equals(name))
+				return col;
+		}
+		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
+			TableField col = it.next();
+			if(col.getColumnName().equals(name))
+				return col;
+		}
+		return null;
+	}
+	
+	/**
+	 * 根据属性名查找 字段信息
+	 * @param colname
+	 * @return
+	 */
+	public TableField findFieldByColumn(String name){
+		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
+			TableField col = it.next();
+			if(col.getColumnName().equals(name))
+				return col;
+		}
+		for(Iterator<TableField> it = columns.iterator();it.hasNext();){
+			TableField col = it.next();
+			if(col.getPropertyName().equals(name))
 				return col;
 		}
 		return null;
@@ -155,27 +179,27 @@ public class TableInfo {
 	}
 	
 	private void saveProperty(TableField field,Element propElt,boolean keyProp){
-		propElt.addAttribute("name", field.getName());
+		propElt.addAttribute("name", field.getPropertyName());
 		propElt.addAttribute("type", field.getHibernateType());
 		Element colElt = propElt.addElement("column");
 		saveColumn(field,colElt,keyProp);
 	}
 	
 	private void saveColumn(TableField field,Element colElt,boolean keyProp){
-		colElt.addAttribute("name", field.getColumn().toUpperCase());
-		if("Long".equals(field.getType()) || "Double".equals(field.getType()) ){
+		colElt.addAttribute("name", field.getColumnName().toUpperCase());
+		if("Long".equals(field.getJavaType()) || "Double".equals(field.getJavaType()) ){
 			colElt.addAttribute("precision", String.valueOf(field.getPrecision()));
 			colElt.addAttribute("scale", String.valueOf(field.getScale()));
 		}else if(field.getMaxLength()>0)
 			colElt.addAttribute("length", String.valueOf(field.getMaxLength()));
 		
-		if(!keyProp && field.isNotNull())
+		if(!keyProp && field.isMandatory())
 			colElt.addAttribute("not-null", "true");
 	}
 	
 	private void setAppPropertiesValue(Properties prop,String key,String value )
 	{
-		String sKey = /*sModuleName +'.'+ */ TableField.mapPropName(sTabName) +'.'+key;
+		String sKey = /*sModuleName +'.'+ */ TableField.mapPropName(tableName) +'.'+key;
 		if(! prop.containsKey(sKey))
 			prop.setProperty(sKey,  value);
 	}
@@ -191,11 +215,11 @@ public class TableInfo {
 				}
 			}
 		    
-			setAppPropertiesValue(prop,"list.title",sTabDesc+"列表");
-			setAppPropertiesValue(prop,"edit.title","编辑"+sTabDesc);
-			setAppPropertiesValue(prop,"view.title","查看"+sTabDesc);
+			setAppPropertiesValue(prop,"list.title",tableLabelName+"列表");
+			setAppPropertiesValue(prop,"edit.title","编辑"+tableLabelName);
+			setAppPropertiesValue(prop,"view.title","查看"+tableLabelName);
 			for(TableField col : columns )
-				setAppPropertiesValue(prop,TableField.mapPropName(col.getColumn()),col.getDesc());
+				setAppPropertiesValue(prop,TableField.mapPropName(col.getColumnName()),col.getFieldLabelName());
 		    
 			try(FileOutputStream outputFile = new FileOutputStream(filename+"_zh_CN.properties")){   
 			    prop.store(outputFile, "create by centit B/S framework!");  
@@ -214,11 +238,11 @@ public class TableInfo {
 				}
 			}
 		    
-			setAppPropertiesValue(prop,"list.title",TableField.mapPropName(sTabName)+" list");
-			setAppPropertiesValue(prop,"edit.title","new or edit "+TableField.mapPropName(sTabName)+" piece");
-			setAppPropertiesValue(prop,"view.title","view "+TableField.mapPropName(sTabName)+" piece");
+			setAppPropertiesValue(prop,"list.title",TableField.mapPropName(tableName)+" list");
+			setAppPropertiesValue(prop,"edit.title","new or edit "+TableField.mapPropName(tableName)+" piece");
+			setAppPropertiesValue(prop,"view.title","view "+TableField.mapPropName(tableName)+" piece");
 			for(TableField col : columns )
-				setAppPropertiesValue(prop,TableField.mapPropName(col.getColumn()),col.getName());
+				setAppPropertiesValue(prop,TableField.mapPropName(col.getColumnName()),col.getPropertyName());
 		    
 		    try(FileOutputStream outputFile = new FileOutputStream(filename+".properties")){   
 			    prop.store(outputFile, "create by centit B/S framework!");   
@@ -246,14 +270,14 @@ public class TableInfo {
 		Element root  = doc.addElement("hibernate-mapping");//首先建立根元素 
 		//create class
 		Element classElt = root.addElement("class");
-		classElt.addAttribute("name", sPackageName+'.'+getClassName());
-		classElt.addAttribute("table", sTabName.toUpperCase());
-		classElt.addAttribute("schema", sSchema);
+		classElt.addAttribute("name", packageName+'.'+getClassName());
+		classElt.addAttribute("table", tableName.toUpperCase());
+		classElt.addAttribute("schema", schema);
 		//save primary key
 		if(pkColumns!=null && pkColumns.size()>1){
 			Element idElt = classElt.addElement("composite-id");
 			idElt.addAttribute("name", "cid");
-			idElt.addAttribute("class", sPackageName+'.'+getClassName()+"Id");
+			idElt.addAttribute("class", packageName+'.'+getClassName()+"Id");
 			for(Iterator<String> it = pkColumns.iterator();it.hasNext();){
 				String pkcol = it.next();
 				TableField field = findField(pkcol);
@@ -274,7 +298,7 @@ public class TableInfo {
 		if(columns !=null){
 			for(Iterator<TableField> it = columns.iterator();it.hasNext();){
 				TableField col = it.next();
-				if(isParmaryKey(col.getColumn()))
+				if(isParmaryKey(col.getColumnName()))
 					continue;
 				Element propElt = classElt.addElement("property");
 				saveProperty(col,propElt,false);
@@ -294,7 +318,7 @@ public class TableInfo {
 					saveColumn(col,colElt,false);
 				}
 				Element maptypeElt = setElt.addElement("one-to-many");
-				maptypeElt.addAttribute("class", sPackageName+'.'+ ref.getClassName());
+				maptypeElt.addAttribute("class", packageName+'.'+ ref.getClassName());
 			}
 		}
 		writerXMLFile(doc,filename);		
@@ -322,7 +346,7 @@ public class TableInfo {
 
 
 	public String getClassName() {
-		String sClassName = TableField.mapPropName(sTabName);
+		String sClassName = TableField.mapPropName(tableName);
 		return sClassName.substring(0,1).toUpperCase() + 
 				sClassName.substring(1);	
 	}

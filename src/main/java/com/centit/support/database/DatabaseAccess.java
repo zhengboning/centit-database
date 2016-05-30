@@ -182,13 +182,16 @@ public class DatabaseAccess {
 			JSONObject jo = new JSONObject();
 			for (int i = 0; i < cc; i++) {
 				Object obj = rs.getObject(i + 1);
-				if (obj instanceof Clob) {
-					jo.put(fieldNames[i], fetchClobString((Clob) obj));
+				if(obj!=null){
+					if (obj instanceof Clob) {
+						jo.put(fieldNames[i], fetchClobString((Clob) obj));
+					}
+					if (obj instanceof Blob) {
+						jo.put(fieldNames[i], fetchBlobAsBase64((Blob) obj));
+					} else {
+						jo.put(fieldNames[i], obj);
+					}
 				}
-				if (obj instanceof Blob) {
-					jo.put(fieldNames[i], fetchBlobAsBase64((Blob) obj));
-				} else
-					jo.put(fieldNames[i], obj);
 			}
 			ja.add(jo);
 		}
@@ -378,7 +381,7 @@ public class DatabaseAccess {
 		}
 	}
 
-	public static Object filterLobField(Object fieldData, boolean blobAsBase64String) {
+	public static Object fetchLobField(Object fieldData, boolean blobAsBase64String) {
 		try {
 			if (fieldData instanceof Clob) {
 				return DatabaseAccess.fetchClobString((Clob) fieldData);

@@ -118,8 +118,8 @@ public class PdmReader implements DatabaseMetadata {
 		//System.out.println(nTab.asXML());
 		Element eTab = (Element)nTab;
 		
-		tab.setTabDesc(getElementText(eTab,"a","Name"));
-		tab.setTabComment(getElementText(eTab,"a","Comment"));
+		tab.setTableLableName(getElementText(eTab,"a","Name"));
+		tab.setTableComment(getElementText(eTab,"a","Comment"));
 		//System.out.println(getElementText(eTab.element("a:Name")));
 		Element elColumns = eTab.element(getPdmQName("c","Columns"));///o:Column
 		if(elColumns==null)
@@ -128,10 +128,10 @@ public class PdmReader implements DatabaseMetadata {
 		List<Element> columns = (List<Element>) elColumns.elements(getPdmQName("o","Column"));///o:Column
 		for(Element col : columns){
 			TableField field = new TableField();
-			field.setColumn(getElementText(col,"a","Code"));
+			field.setColumnName(getElementText(col,"a","Code"));
 			
 			//System.out.println(col.attributeValue("a:Code"));
-			field.setDBType(getElementText(col,"a","DataType"));
+			field.setColumnType(getElementText(col,"a","DataType"));
 			String stemp = getElementText(col,"a","Length");
 			if(stemp !=null){
 				field.setMaxLength(Integer.valueOf(stemp));
@@ -144,9 +144,9 @@ public class PdmReader implements DatabaseMetadata {
 			
 			stemp = getElementText(col,"a","Mandatory");
 			if(stemp !=null)
-				field.setNotNull(stemp);
-			field.setDesc(getElementText(col,"a","Name"));
-			field.setComment(getElementText(col,"a","Comment"));
+				field.setMandatory(stemp);
+			field.setFieldLabelName(getElementText(col,"a","Name"));
+			field.setColumnComment(getElementText(col,"a","Comment"));
 			
 			field.mapToMetadata();
 			
@@ -209,9 +209,9 @@ public class PdmReader implements DatabaseMetadata {
 					continue;
 				//System.out.println(col.asXML());
 				
-				field.setColumn(getElementText(col,"a","Code"));
+				field.setColumnName(getElementText(col,"a","Code"));
 				//System.out.println(col.attributeValue("a:Code"));
-				field.setDBType(getElementText(col,"a","DataType"));
+				field.setColumnType(getElementText(col,"a","DataType"));
 				String stemp = getElementText(col,"a","Length");
 				if(stemp !=null){
 					field.setMaxLength(Integer.valueOf(stemp));
@@ -224,9 +224,9 @@ public class PdmReader implements DatabaseMetadata {
 				
 				stemp = getElementText(col,"a","Mandatory");
 				if(stemp !=null)
-					field.setNotNull(stemp);
-				field.setDesc(getElementText(col,"a","Name"));
-				field.setComment(getElementText(col,"a","Comment"));
+					field.setMandatory(stemp);
+				field.setFieldLabelName(getElementText(col,"a","Name"));
+				field.setColumnComment(getElementText(col,"a","Comment"));
 				
 				field.mapToMetadata();
 				ref.getFkcolumns().add(field);
@@ -241,8 +241,8 @@ public class PdmReader implements DatabaseMetadata {
 		HibernateMapInfo hibernateMeta = new HibernateMapInfo();		
 		hibernateMeta.setClassName(tableMeta.getPackageName()+'.'+tableMeta.getClassName());
 		hibernateMeta.setTableName(tableMeta.getTabName().toUpperCase());
-		hibernateMeta.setTableDesc(tableMeta.getTabDesc());
-		hibernateMeta.setTableComment(tableMeta.getTabComment());
+		hibernateMeta.setTableLabelName(tableMeta.getTableLableName());
+		hibernateMeta.setTableComment(tableMeta.getTableComment());
 		hibernateMeta.setMainTable(true);
 		hibernateMeta.setHasID( tableMeta.getPkColumns().size()>1 );
 		if(hibernateMeta.isHasID()){
@@ -251,11 +251,11 @@ public class PdmReader implements DatabaseMetadata {
 		}else if(tableMeta.getPkColumns().size()==1){
 			TableField field = tableMeta.findField(tableMeta.getPkColumns().get(0));
 			hibernateMeta.setIdType(field.getHibernateType() );
-			hibernateMeta.setIdName( field.getName() ); 
+			hibernateMeta.setIdName( field.getPropertyName() ); 
 		}
 
 		for(TableField col : tableMeta.getColumns()){
-			if(tableMeta.isParmaryKey(col.getColumn())){
+			if(tableMeta.isParmaryKey(col.getColumnName())){
 				hibernateMeta.getKeyProperties().add(col);
 			}else{
 				hibernateMeta.getProperties().add(col);

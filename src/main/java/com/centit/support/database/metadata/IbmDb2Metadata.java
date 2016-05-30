@@ -64,12 +64,12 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
 				TableField field = new TableField();
-				field.setColumn(rs.getString("name"));
-				field.setDBType(rs.getString("coltype"));
+				field.setColumnName(rs.getString("name"));
+				field.setColumnType(rs.getString("coltype"));
 				field.setMaxLength(rs.getInt("length"));
 				field.setPrecision(field.getMaxLength());
 				field.setScale(rs.getInt("scale"));
-				field.setNullEnable(rs.getString("nulls"));
+				field.setMandatory(rs.getString("nulls"));
 				field.mapToMetadata();
 		
 				tab.getColumns().add(field);
@@ -104,7 +104,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 				}
 				for(int i=0;i<p.length;i++){
 					TableField field = new TableField();
-					field.setColumn(p[i]);
+					field.setColumnName(p[i]);
 					ref.getFkcolumns().add(field);					
 				}
 				tab.getReferences().add(ref );
@@ -119,14 +119,14 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 					pStmt= conn.prepareStatement(sqlFKColumn);
 					pStmt.setString(1,sDBSchema);
 					pStmt.setString(2,ref.getTableName());
-					pStmt.setString(3,field.getColumn());
+					pStmt.setString(3,field.getColumnName());
 					rs = pStmt.executeQuery();
 					if (rs.next()) {
-						field.setDBType(rs.getString("coltype"));
+						field.setColumnType(rs.getString("coltype"));
 						field.setMaxLength(rs.getInt("length"));
 						field.setPrecision(field.getMaxLength());
 						field.setScale(rs.getInt("scale"));
-						field.setNullEnable(rs.getString("nulls"));
+						field.setMandatory(rs.getString("nulls"));
 						field.mapToMetadata();
 					}
 					rs.close();

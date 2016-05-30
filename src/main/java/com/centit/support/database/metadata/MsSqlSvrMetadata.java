@@ -79,12 +79,12 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 			while (rs.next()) {
 				// a.name, c.name AS typename, a.length , a.xprec, a.xscale, isnullable
 				TableField field = new TableField();
-				field.setColumn(rs.getString("name"));
-				field.setDBType(rs.getString("typename"));
+				field.setColumnName(rs.getString("name"));
+				field.setColumnType(rs.getString("typename"));
 				field.setMaxLength(rs.getInt("length"));
 				field.setPrecision(rs.getInt("xprec"));
 				field.setScale(rs.getInt("xscale"));
-				field.setNullEnable(rs.getString("isnullable"));
+				field.setMandatory(rs.getString("isnullable"));
 				field.mapToMetadata();
 				
 				tab.getColumns().add(field);
@@ -138,12 +138,12 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 				while (rs.next()) {
 					//"select a.name,a.object_id,a.parent_object_id , b.name as tabname "+
 					TableField field = new TableField();
-					field.setColumn(rs.getString("name"));
-					field.setDBType(rs.getString("typename"));
+					field.setColumnName(rs.getString("name"));
+					field.setColumnType(rs.getString("typename"));
 					field.setMaxLength(rs.getInt("length"));
 					field.setPrecision(rs.getInt("xprec"));
 					field.setScale(rs.getInt("xscale"));
-					field.setNullEnable(rs.getString("isnullable"));
+					field.setMandatory(rs.getString("isnullable"));
 					field.mapToMetadata();
 					
 					ref.getFkcolumns().add(field);

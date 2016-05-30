@@ -1,16 +1,16 @@
 package com.centit.support.database.metadata;
 
 public class TableField {
-	private String sName;// 字段属性名称 
-	private String sDesc;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
-	private String sType;// 类型
-	private String sDBType;// 数据库中的字段类型
-	private String sColumn;// 字段代码 PDM中的CODE
-	private String sComment;// 字段注释
-	private boolean bNotNull;
-	private int 	nMaxLength;//最大长度 Only used when sType=String
-	private int  nPrecision;//有效数据位数 Only used when sType=Long Number Float
-	private int  nScale;//精度 Only used when sType= Long Number Float
+	private String propertyName;// 字段属性名称 
+	private String fieldLabelName;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
+	private String javaType;// 类型
+	private String columnType;// 数据库中的字段类型
+	private String columnName;// 字段代码 PDM中的CODE
+	private String columnComment;// 字段注释
+	private boolean mandatory;
+	private int 	maxLength;//最大长度 Only used when sType=String
+	private int  precision;//有效数据位数 Only used when sType=Long Number Float
+	private int  scale;//精度 Only used when sType= Long Number Float
 	
 	public static String mapPropName(String dbObjectName){
 		String sTempName = dbObjectName.toLowerCase();
@@ -39,66 +39,66 @@ public class TableField {
 	
 	public void mapToMetadata()
 	{
-		sName = mapPropName(sColumn);
+		propertyName = mapPropName(columnName);
 	
-		if("NUMBER".equalsIgnoreCase(sDBType) ||
-		   "INTEGER".equalsIgnoreCase(sDBType)||
-		   "DECIMAL".equalsIgnoreCase(sDBType) ){
-			if( nScale > 0 )
-				sType = "Double";
+		if("NUMBER".equalsIgnoreCase(columnType) ||
+		   "INTEGER".equalsIgnoreCase(columnType)||
+		   "DECIMAL".equalsIgnoreCase(columnType) ){
+			if( scale > 0 )
+				javaType = "Double";
 			else
-				sType = "Long";
-			if(nMaxLength <= 0)
-				nMaxLength = 8;
-		}else if("CHAR".equalsIgnoreCase(sDBType) ||
-			   "VARCHAR".equalsIgnoreCase(sDBType)||
-			   "VARCHAR2".equalsIgnoreCase(sDBType) ){
-			sType = "String";
-		}else if("DATE".equalsIgnoreCase(sDBType) ||
-				   "TIME".equalsIgnoreCase(sDBType)||
-				   "DATETIME".equalsIgnoreCase(sDBType) ){
-			sType = "Date";
-			if(nMaxLength <= 0)
-				nMaxLength = 7;
-		}else if("TIMESTAMP".equalsIgnoreCase(sDBType) ){
-			sType = "Timestamp";
-			if(nMaxLength <= 0)
-				nMaxLength = 7;
-		}else if("CLOB".equalsIgnoreCase(sDBType) /*||
+				javaType = "Long";
+			if(maxLength <= 0)
+				maxLength = 8;
+		}else if("CHAR".equalsIgnoreCase(columnType) ||
+			   "VARCHAR".equalsIgnoreCase(columnType)||
+			   "VARCHAR2".equalsIgnoreCase(columnType) ){
+			javaType = "String";
+		}else if("DATE".equalsIgnoreCase(columnType) ||
+				   "TIME".equalsIgnoreCase(columnType)||
+				   "DATETIME".equalsIgnoreCase(columnType) ){
+			javaType = "Date";
+			if(maxLength <= 0)
+				maxLength = 7;
+		}else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
+			javaType = "Timestamp";
+			if(maxLength <= 0)
+				maxLength = 7;
+		}else if("CLOB".equalsIgnoreCase(columnType) /*||
 				   "LOB".equalsIgnoreCase(sDBType)||
 				   "BLOB".equalsIgnoreCase(sDBType)*/ ){
-			sType = "String";
+			javaType = "String";
 		}else
-			sType = sDBType;
+			javaType = columnType;
 	}
 	
 	public String getHibernateType(){
-		if(sType !=null && ( sType.equals("Date")|| sType.equals("Timestamp")))
-			return "java.util."+sType;
-		return "java.lang."+sType;
+		if(javaType !=null && ( javaType.equals("Date")|| javaType.equals("Timestamp")))
+			return "java.util."+javaType;
+		return "java.lang."+javaType;
 	}
 	
 	public TableField()
 	{
-		bNotNull = false;
-		nMaxLength = 0;
-		nPrecision = 0;//有效数据位数 Only used when sType=Long Number Float
-		nScale = 0;//精度 Only used when sType= Long Number Float
+		mandatory = false;
+		maxLength = 0;
+		precision = 0;//有效数据位数 Only used when sType=Long Number Float
+		scale = 0;//精度 Only used when sType= Long Number Float
 	}
 	/**
 	 * 字段属性名，是通过字段的code转化过来的
 	 */
-	public String getName() {
-		return sName;
+	public String getPropertyName() {
+		return propertyName;
 	}
-	public void setName(String name) {
-		sName = name;
+	public void setPropertyName(String name) {
+		propertyName = name;
 	}
 	/**
 	 * 字段属性java类别
 	 */
-	public String getType() {
-		return sType;
+	public String getJavaType() {
+		return javaType;
 	}
 	
 	public static String trimType(String st ){
@@ -108,65 +108,61 @@ public class TableField {
 		return st;		
 	}
 	
-	public void setType(String st) {
-		sType = trimType(st);
+	public void setJavaType(String st) {
+		javaType = trimType(st);
 	}
 	
 	/**
 	 * 字段中文名，对应Pdm中的name
 	 */	
-	public String getDesc() {
-		return sDesc;
+	public String getFieldLabelName() {
+		return fieldLabelName;
 	}
 	
 	/**
 	 * 字段中文名，对应Pdm中的name
 	 */	
-	public void setDesc(String desc) {
-		sDesc = desc;
+	public void setFieldLabelName(String desc) {
+		fieldLabelName = desc;
 	}
 		
 	/**
 	 * 字段代码，对应Pdm中的code
 	 */	
-	public String getColumn() {
-		return sColumn;
+	public String getColumnName() {
+		return columnName;
 	}
 	
 	/**
 	 * @param  column 字段代码，对应Pdm中的code
 	 */	
-	public void setColumn(String column) {
-		sColumn = column;
+	public void setColumnName(String column) {
+		columnName = column;
 	}
 
 	/**
 	 * 字段描述，对应Pdm中的Comment
 	 */	
-	public String getComment() {
-		return sComment;
+	public String getColumnComment() {
+		return columnComment;
 	}
 	
-	public void setComment(String comment) {
-		sComment = comment;
+	public void setColumnComment(String comment) {
+		columnComment = comment;
 	}
 	
-	public boolean isNotNull() {
-		return bNotNull;
+	public boolean isMandatory() {
+		return mandatory;
 	}
 	
-	public void setNotNull(boolean notNull) {
-		bNotNull = notNull;
+	public void setMandatory(boolean notnull) {
+		this.mandatory = notnull;
 	}
 	
-	public void setNotNull(String sNotNull) {
-		bNotNull = "true".equalsIgnoreCase(sNotNull) ||
-			"1".equals(sNotNull);
-	}	
-	public void setNullEnable(String sNullEnable) {
-		bNotNull = 
-			("N".equalsIgnoreCase(sNullEnable) ||
-					"0".equalsIgnoreCase(sNullEnable));
+	public void setMandatory(String notnull) {
+		mandatory = 
+			("true".equalsIgnoreCase(notnull) ||
+					"1".equalsIgnoreCase(notnull));
 	}	
 	
 	/**
@@ -175,10 +171,10 @@ public class TableField {
 	 * @return 最大长度 
 	 */	
 	public int getMaxLength() {
-		return nMaxLength;
+		return maxLength;
 	}
 	public void setMaxLength(int maxLength) {
-		nMaxLength = maxLength;
+		this.maxLength = maxLength;
 	}
 	
 	/**
@@ -187,34 +183,34 @@ public class TableField {
 	 * @return 有效数据位数
 	 */
 	public int getPrecision() {
-		return nPrecision;
+		return precision;
 	}
 	public void setPrecision(int precision) {
-		nPrecision = precision;
+		this.precision = precision;
 	}
 	/**
 	 * 精度 Only used when sType= Long Number Float
 	 * @return 精度
 	 */
 	public int getScale() {
-		return nScale;
+		return scale;
 	}
 	public void setScale(int scale) {
-		nScale = scale;
+		this.scale = scale;
 	}
 	/**
 	 * 字段属性在数据库表中的类型
 	 */
-	public String getDBType() {
-		return sDBType;
+	public String getColumnType() {
+		return columnType;
 	}
 
-	public void setDBType(String type) {
+	public void setColumnType(String type) {
 		if(type !=null){
-			sDBType = type.trim();
-			int nPos = sDBType.indexOf('(');
+			columnType = type.trim();
+			int nPos = columnType.indexOf('(');
 			if(nPos>0)
-				sDBType = sDBType.substring(0,nPos);
+				columnType = columnType.substring(0,nPos);
 		}
 	}
 }

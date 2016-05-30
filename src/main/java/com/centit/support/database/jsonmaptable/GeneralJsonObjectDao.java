@@ -72,8 +72,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 				sBuilder.append(" ");
 			if(addAlias)
 				sBuilder.append(alias).append('.');
-			sBuilder.append(col.getColumn());
-			fieldNames[i] = col.getName();
+			sBuilder.append(col.getColumnName());
+			fieldNames[i] = col.getPropertyName();
 			i++;
 		}
 		return new ImmutablePair<String,String[]>(sBuilder.toString(),fieldNames);
@@ -85,10 +85,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		for(String plCol : ti.getPkColumns()){
 			if(i>0)
 				sBuilder.append(" and ");
-			TableField col = ti.findField(plCol);
+			TableField col = ti.findFieldByColumn(plCol);
 			if(StringUtils.isNotBlank(alias))
 				sBuilder.append(alias).append('.');
-			sBuilder.append(col.getColumn()).append(" = :").append(col.getName());
+			sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
 			i++;
 		}
 		return sBuilder.toString();
@@ -103,7 +103,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 			TableField col = ti.findFieldByName(plCol);
 			if(StringUtils.isNotBlank(alias))
 				sBuilder.append(alias).append('.');
-			sBuilder.append(col.getColumn()).append(" = :").append(col.getName());
+			sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
 			i++;
 		}
 		return sBuilder.toString();
@@ -184,20 +184,38 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 				 startPos, maxSize);
 	}
 
+	private String buildInsertSql(Collection<String> fields){
+		StringBuilder sbInsert = new StringBuilder("insert into ");
+		sbInsert.append(tableInfo.getTabName()).append(" ( ");
+		StringBuilder sbValues = new StringBuilder(" ) values ( ");
+		int i=0;
+		for(String f : fields){
+			if(i>0){
+				sbInsert.append(", ");
+				sbValues.append(", ");
+			}
+			TableField col = tableInfo.findFieldByName(f);
+			sbInsert.append(col.getColumnName());
+			sbValues.append(":").append(f);
+			i++;
+		}
+		return sbInsert.append(sbValues).append(")").toString();		
+	}
+	
 	@Override
-	public void saveNewObject(JSONObject object) throws SQLException {
+	public void saveNewObject( Map<String, Object> object) throws SQLException {
+		String sql = buildInsertSql(object.keySet());
+		DatabaseAccess.doExecuteNamedSql(conn, sql, object);
+	}
+
+	@Override
+	public void updateObject( Map<String, Object> object) throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void updateObject(JSONObject object) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mergeObject(JSONObject object) throws SQLException {
+	public void mergeObject( Map<String, Object> object) throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}

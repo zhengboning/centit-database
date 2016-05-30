@@ -66,12 +66,12 @@ public class OracleMetadata implements DatabaseMetadata {
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
 				TableField field = new TableField();
-				field.setColumn(rs.getString("COLUMN_NAME"));
-				field.setDBType(rs.getString("DATA_TYPE"));
+				field.setColumnName(rs.getString("COLUMN_NAME"));
+				field.setColumnType(rs.getString("DATA_TYPE"));
 				field.setMaxLength(rs.getInt("DATA_LENGTH"));
 				field.setPrecision(rs.getInt("DATA_PRECISION"));
 				field.setScale(rs.getInt("DATA_SCALE"));
-				field.setNullEnable(rs.getString("NULLABLE"));
+				field.setMandatory(rs.getString("NULLABLE"));
 				field.mapToMetadata();
 				
 				tab.getColumns().add(field);
@@ -117,12 +117,12 @@ public class OracleMetadata implements DatabaseMetadata {
 				rs = pStmt.executeQuery();
 				while (rs.next()) {
 					TableField field = new TableField();
-					field.setColumn(rs.getString("COLUMN_NAME"));
-					field.setDBType(rs.getString("DATA_TYPE"));
+					field.setColumnName(rs.getString("COLUMN_NAME"));
+					field.setColumnType(rs.getString("DATA_TYPE"));
 					field.setMaxLength(rs.getInt("DATA_LENGTH"));
 					field.setPrecision(rs.getInt("DATA_PRECISION"));
 					field.setScale(rs.getInt("DATA_SCALE"));
-					field.setNullEnable(rs.getString("NULLABLE"));
+					field.setMandatory(rs.getString("NULLABLE"));
 					field.mapToMetadata();
 					
 					ref.getFkcolumns().add(field);

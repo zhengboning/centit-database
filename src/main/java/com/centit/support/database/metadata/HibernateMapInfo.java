@@ -20,16 +20,16 @@ import com.centit.support.xml.IgnoreDTDEntityResolver;
  *
  */
 public class HibernateMapInfo {
-	private String sClassName;
-	private String sTableName;
-	private String sTableDesc;
-	private String sTableComment;
+	private String className;
+	private String tableName;
+	private String tableLabelName;//中文名
+	private String tableComment;
 	private List<TableField> keyProperties;
 	private List<TableField> properties;
 	private boolean isMainTable;
-	private boolean hasID;
-	private String sIdType;
-	private String sIdName;
+	private boolean hasComplexId;
+	private String idType;
+	private String idName;
 	private List<HibernateMapInfo> one2manys;
 	private List<TableReference> references;
 
@@ -43,53 +43,53 @@ public class HibernateMapInfo {
 	}
 	
 	public boolean isHasID() {
-		return hasID;
+		return hasComplexId;
 	}
 
 	public void setHasID(boolean hasID) {
-		this.hasID = hasID;
+		this.hasComplexId = hasID;
 	}
 
 	public String getIdType() {
-		return sIdType;
+		return idType;
 	}
 
 	public void setIdType(String idType) {
-		sIdType = idType;
+		this.idType = idType;
 	}
 	public String getIdName() {
-		return sIdName;
+		return idName;
 	}
 
 	public void setIdName(String idName) {
-		sIdName = idName;
+		this.idName = idName;
 	}
 	public boolean isMainTable() {
 		return isMainTable;
 	}
 
 	public void setClassName(String sClassName) {
-		this.sClassName = sClassName;
+		this.className = sClassName;
 	}
 
 	public void setTableName(String sTableName) {
-		this.sTableName = sTableName;
+		this.tableName = sTableName;
 	}
 
-	public String getTableDesc() {
-		return sTableDesc;
+	public String getTableLabelName() {
+		return tableLabelName;
 	}
 
-	public void setTableDesc(String sTableDesc) {
-		this.sTableDesc = sTableDesc;
+	public void setTableLabelName(String sTableDesc) {
+		this.tableLabelName = sTableDesc;
 	}
 
 	public String getTableComment() {
-		return sTableComment;
+		return tableComment;
 	}
 
 	public void setTableComment(String sTableComment) {
-		this.sTableComment = sTableComment;
+		this.tableComment = sTableComment;
 	}
 	
 	public void setKeyProperties(List<TableField> keyProperties) {
@@ -115,7 +115,7 @@ public class HibernateMapInfo {
 	public HibernateMapInfo()
 	{
 		isMainTable = true;
-		hasID = false;
+		hasComplexId = false;
 	}
 	public static String trimToSimpleClassName(String className)
 	{
@@ -128,14 +128,14 @@ public class HibernateMapInfo {
 	
 	public String getClassSimpleName()
 	{
-		return trimToSimpleClassName(sClassName);
+		return trimToSimpleClassName(className);
 	}
 	
 	
 	private TableField loadField(Element fieldNode)
 	{
 		TableField field = new TableField();
-		field.setName(fieldNode.attribute("name").getValue());
+		field.setPropertyName(fieldNode.attribute("name").getValue());
 		
 		String sType = "";
 		Attribute atType = fieldNode.attribute("type");
@@ -147,17 +147,17 @@ public class HibernateMapInfo {
 				sType = atType.getValue();
 		}
 			
-		field.setType(sType);
+		field.setJavaType(sType);
 		Element columnNode =  fieldNode.element("column");
 		if(columnNode != null){
 			Attribute attr;
-			field.setColumn(columnNode.attribute("name").getValue());
+			field.setColumnName(columnNode.attribute("name").getValue());
 			attr =  columnNode.attribute("length");
 			if(attr != null)
 				field.setMaxLength( Integer.valueOf(attr.getValue()));
 			attr =  columnNode.attribute("not-null");
 			if(attr != null)
-				field.setNotNull(attr.getValue());
+				field.setMandatory(attr.getValue());
 			attr =  columnNode.attribute("precision");
 			if(attr != null)
 				field.setPrecision( Integer.valueOf(attr.getValue()));
@@ -185,24 +185,24 @@ public class HibernateMapInfo {
 
 			Document doc= builder.read(is);
 			Element classNode=doc.getRootElement().element("class");
-			sClassName = classNode.attribute("name").getValue();
+			className = classNode.attribute("name").getValue();
 			attr =  classNode.attribute("table");
 			if(attr != null)
-				sTableName = attr.getValue();
+				tableName = attr.getValue();
 			
 			Element idNode = classNode.element("id");
 			if(idNode != null){// 单个主键属性
 				TableField tf = loadField(idNode);
-				hasID = false;
-				sIdType = TableField.trimType(tf.getType());
-				sIdName = tf.getName();
+				hasComplexId = false;
+				idType = TableField.trimType(tf.getJavaType());
+				idName = tf.getPropertyName();
 				keyProperties.add(tf);
 			}else{//复合主键值
 				idNode = classNode.element("composite-id");//key-property 
-				hasID = true;
-				sIdType = idNode.attributeValue("class");
-				sIdName = idNode.attributeValue("name");
-				sIdType = TableField.trimType(sIdType);
+				hasComplexId = true;
+				idType = idNode.attributeValue("class");
+				idName = idNode.attributeValue("name");
+				idType = TableField.trimType(idType);
 				
 				List<Element> keyNodes = (List<Element>) idNode.elements("key-property");
 				for(Element key : keyNodes){
@@ -251,7 +251,7 @@ public class HibernateMapInfo {
 						List<Element> colElements = (List<Element>) keyElt.elements("column");
 						for(Element colElt : colElements){
 							TableField field = new TableField();
-							field.setColumn(colElt.attributeValue("name"));
+							field.setColumnName(colElt.attributeValue("name"));
 							field.mapToMetadata();
 							ref.getFkcolumns().add(field);
 						}
@@ -268,11 +268,11 @@ public class HibernateMapInfo {
 	}
 
 	public String getClassName() {
-		return sClassName;
+		return className;
 	}
 
 	public String getTableName() {
-		return sTableName;
+		return tableName;
 	}
 
 	public List<TableField> getKeyProperties() {

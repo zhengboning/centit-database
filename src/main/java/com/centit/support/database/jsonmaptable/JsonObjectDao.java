@@ -54,19 +54,19 @@ public interface JsonObjectDao {
 	 * 保存
 	 * @param object
 	 */
-	public void saveNewObject(JSONObject object) throws SQLException;
+	public void saveNewObject( Map<String, Object> object) throws SQLException;
 	
 	/**
 	 * 更改部分属性
 	 * @param object
 	 */
-	public void updateObject(JSONObject object) throws SQLException;
+	public void updateObject( Map<String, Object> object) throws SQLException;
 	
 	/**
 	 * 合并
 	 * @param object
 	 */
-	public void mergeObject(JSONObject object) throws SQLException;
+	public void mergeObject( Map<String, Object> object) throws SQLException;
 	
 	/**
 	 * 根据条件批量更新 对象

@@ -51,7 +51,7 @@ public class TableReference {
 		if(sCol==null || fkcolumns==null || fkcolumns.size() == 0)
 			return false;
 		for(TableField tf : fkcolumns){
-			if(sCol.equalsIgnoreCase(tf.getColumn()))
+			if(sCol.equalsIgnoreCase(tf.getColumnName()))
 				return true;
 		}
 		return false;
