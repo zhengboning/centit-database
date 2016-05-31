@@ -7,6 +7,7 @@ public class TableField {
 	private String columnType;// 数据库中的字段类型
 	private String columnName;// 字段代码 PDM中的CODE
 	private String columnComment;// 字段注释
+	private String defaultValue;
 	private boolean mandatory;
 	private int 	maxLength;//最大长度 Only used when sType=String
 	private int  precision;//有效数据位数 Only used when sType=Long Number Float
@@ -218,5 +219,13 @@ public class TableField {
 			if(nPos>0)
 				columnType = columnType.substring(0,nPos);
 		}
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 }

@@ -47,22 +47,25 @@ public class DatabaseAccess {
 			procDesc.append("?");
 		}
 		procDesc.append(")}");
-		CallableStatement stmt = null;
-
-		stmt = conn.prepareCall(procDesc.toString());
-		stmt.registerOutParameter(1, sqlType);
-		for (int i = 0; i < n; i++) {
-			if (paramObjs[i] == null)
-				stmt.setNull(i + 2, Types.NULL);
-			else if (paramObjs[i] instanceof java.util.Date)
-				stmt.setObject(i + 2, DatetimeOpt.convertSqlDate((java.util.Date) paramObjs[i]));
-			else
-				stmt.setObject(i + 2, paramObjs[i]);
-		}
-		stmt.execute();
-		Object rObj = stmt.getObject(1);
-		return rObj;
-
+		try{
+			CallableStatement stmt = null;
+	
+			stmt = conn.prepareCall(procDesc.toString());
+			stmt.registerOutParameter(1, sqlType);
+			for (int i = 0; i < n; i++) {
+				if (paramObjs[i] == null)
+					stmt.setNull(i + 2, Types.NULL);
+				else if (paramObjs[i] instanceof java.util.Date)
+					stmt.setObject(i + 2, DatetimeOpt.convertSqlDate((java.util.Date) paramObjs[i]));
+				else
+					stmt.setObject(i + 2, paramObjs[i]);
+			}
+			stmt.execute();
+			Object rObj = stmt.getObject(1);
+			return rObj;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(procDesc.toString(),e);
+		}	
 	}
 
 	/**
@@ -73,7 +76,6 @@ public class DatabaseAccess {
 	 */
 	public final static boolean callProcedure(Connection conn, String procName, Object... paramObjs)
 			throws SQLException {
-
 		int n = paramObjs.length;
 		StringBuilder procDesc = new StringBuilder("{call ");
 		procDesc.append(procName).append("(");
@@ -83,18 +85,21 @@ public class DatabaseAccess {
 			procDesc.append("?");
 		}
 		procDesc.append(")}");
-		CallableStatement stmt = null;
-
-		stmt = conn.prepareCall(procDesc.toString());
-		for (int i = 0; i < n; i++) {
-			if (paramObjs[i] == null)
-				stmt.setNull(i + 1, Types.NULL);
-			else if (paramObjs[i] instanceof java.util.Date)
-				stmt.setObject(i + 1, DatetimeOpt.convertSqlDate((java.util.Date) paramObjs[i]));
-			else
-				stmt.setObject(i + 1, paramObjs[i]);
-		}
-		stmt.execute();
+		try{
+			CallableStatement stmt = null;
+			stmt = conn.prepareCall(procDesc.toString());
+			for (int i = 0; i < n; i++) {
+				if (paramObjs[i] == null)
+					stmt.setNull(i + 1, Types.NULL);
+				else if (paramObjs[i] instanceof java.util.Date)
+					stmt.setObject(i + 1, DatetimeOpt.convertSqlDate((java.util.Date) paramObjs[i]));
+				else
+					stmt.setObject(i + 1, paramObjs[i]);
+			}
+			stmt.execute();
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(procDesc.toString(),e);
+		}	
 		return true;
 	}
 
@@ -105,8 +110,12 @@ public class DatabaseAccess {
 	 * @throws SQLException
 	 */
 	public final static void doExecuteSql(Connection conn, String sSql) throws SQLException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		stmt.execute();
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			stmt.execute();
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	
@@ -141,9 +150,13 @@ public class DatabaseAccess {
 	 * @param sSql
 	 */
 	public final static void doExecuteSql(Connection conn, String sSql, Object[] values) throws SQLException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);
-		stmt.executeUpdate();
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);
+			stmt.executeUpdate();
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -253,24 +266,27 @@ public class DatabaseAccess {
 	 */
 	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
 			throws SQLException, IOException {
-
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);		
-
-		ResultSet rs = stmt.executeQuery();
-		if (rs == null)
-			return new JSONArray();
-		
-		String[] fns = fieldnames;
-		if(ArrayUtils.isEmpty(fns)){
-			List<String> fields = QueryUtils.getSqlFiledNames(sSql);
-			fns = mapColumnsNameToFields(fields);
-		}
-		JSONArray ja = fetchResultSetToJSONArray(rs, fns);
-		
-		rs.close();
-		stmt.close();
-		return ja;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);		
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs == null)
+				return new JSONArray();
+			
+			String[] fns = fieldnames;
+			if(ArrayUtils.isEmpty(fns)){
+				List<String> fields = QueryUtils.getSqlFiledNames(sSql);
+				fns = mapColumnsNameToFields(fields);
+			}
+			JSONArray ja = fetchResultSetToJSONArray(rs, fns);
+			
+			rs.close();
+			stmt.close();
+			return ja;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}	
 	}
 
 	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values)
@@ -432,15 +448,19 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values)
 			throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);
-		// stmt.setMaxRows(max);
-		ResultSet rs = stmt.executeQuery();
-		// rs.absolute(row)
-		List<Object[]> datas = fetchResultSetToObjectsList(rs);
-		rs.close();
-		stmt.close();
-		return datas;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);
+			// stmt.setMaxRows(max);
+			ResultSet rs = stmt.executeQuery();
+			// rs.absolute(row)
+			List<Object[]> datas = fetchResultSetToObjectsList(rs);
+			rs.close();
+			stmt.close();
+			return datas;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -454,14 +474,18 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, List<Object> values)
 			throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);
-
-		ResultSet rs = stmt.executeQuery();
-		List<Object[]> datas = fetchResultSetToObjectsList(rs);
-		rs.close();
-		stmt.close();
-		return datas;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);
+	
+			ResultSet rs = stmt.executeQuery();
+			List<Object[]> datas = fetchResultSetToObjectsList(rs);
+			rs.close();
+			stmt.close();
+			return datas;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -475,14 +499,18 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object value)
 			throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,new Object[]{value});
-
-		ResultSet rs = stmt.executeQuery();
-		List<Object[]> datas = fetchResultSetToObjectsList(rs);
-		rs.close();
-		stmt.close();
-		return datas;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,new Object[]{value});
+	
+			ResultSet rs = stmt.executeQuery();
+			List<Object[]> datas = fetchResultSetToObjectsList(rs);
+			rs.close();
+			stmt.close();
+			return datas;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -495,12 +523,16 @@ public class DatabaseAccess {
 	 * @throws SQLException
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql) throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		ResultSet rs = stmt.executeQuery();
-		List<Object[]> datas = fetchResultSetToObjectsList(rs);
-		rs.close();
-		stmt.close();
-		return datas;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			ResultSet rs = stmt.executeQuery();
+			List<Object[]> datas = fetchResultSetToObjectsList(rs);
+			rs.close();
+			stmt.close();
+			return datas;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -515,9 +547,8 @@ public class DatabaseAccess {
 	public final static List<Object[]> findObjectsByNamedSql(Connection conn, 
 			String sSql, Map<String, Object> values)
 			throws SQLException, IOException {
-
-		QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
+		QueryAndParams qap = QueryAndParams.
+				createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
 		return findObjectsBySql(conn, qap.getQuery(), qap.getParams());
 	}
 
@@ -625,21 +656,25 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values, int pageNo,
 			int pageSize) throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);
-		
-		if (pageNo > 0 && pageSize > 0)
-			stmt.setMaxRows(pageNo * pageSize);
-
-		ResultSet rs = stmt.executeQuery();
-
-		if (pageNo > 1 && pageSize > 0)
-			rs.absolute((pageNo - 1) * pageSize);
-
-		List<Object[]> datas = DatabaseAccess.fetchResultSetToObjectsList(rs);
-		rs.close();
-		stmt.close();
-		return datas;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);
+			
+			if (pageNo > 0 && pageSize > 0)
+				stmt.setMaxRows(pageNo * pageSize);
+	
+			ResultSet rs = stmt.executeQuery();
+	
+			if (pageNo > 1 && pageSize > 0)
+				rs.absolute((pageNo - 1) * pageSize);
+	
+			List<Object[]> datas = DatabaseAccess.fetchResultSetToObjectsList(rs);
+			rs.close();
+			stmt.close();
+			return datas;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 
 	/**
@@ -659,31 +694,34 @@ public class DatabaseAccess {
 	 */
 	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
 			int pageNo, int pageSize) throws SQLException, IOException {
-
-		PreparedStatement stmt = conn.prepareStatement(sSql);
-		setQueryStmtParameters(stmt,values);
-
-		if (pageNo > 0 && pageSize > 0)
-			stmt.setMaxRows(pageNo * pageSize);
-
-		ResultSet rs = stmt.executeQuery();
-
-		if (rs == null)
-			return new JSONArray();
-
-		if (pageNo > 1 && pageSize > 0)
-			rs.absolute((pageNo - 1) * pageSize);
-
-		String[] fns = fieldnames;
-		if(ArrayUtils.isEmpty(fns)){
-			List<String> fields = QueryUtils.getSqlFiledNames(sSql);			
-			fns = mapColumnsNameToFields(fields);
-		}		
-		JSONArray ja = fetchResultSetToJSONArray(rs, fns);
-
-		rs.close();
-		stmt.close();
-		return ja;
+		try{
+			PreparedStatement stmt = conn.prepareStatement(sSql);
+			setQueryStmtParameters(stmt,values);
+	
+			if (pageNo > 0 && pageSize > 0)
+				stmt.setMaxRows(pageNo * pageSize);
+	
+			ResultSet rs = stmt.executeQuery();
+	
+			if (rs == null)
+				return new JSONArray();
+	
+			if (pageNo > 1 && pageSize > 0)
+				rs.absolute((pageNo - 1) * pageSize);
+	
+			String[] fns = fieldnames;
+			if(ArrayUtils.isEmpty(fns)){
+				List<String> fields = QueryUtils.getSqlFiledNames(sSql);			
+				fns = mapColumnsNameToFields(fields);
+			}		
+			JSONArray ja = fetchResultSetToJSONArray(rs, fns);
+	
+			rs.close();
+			stmt.close();
+			return ja;
+		}catch (SQLException e) {
+			throw new DatabaseAccessException(sSql,e);
+		}
 	}
 	
 	/**

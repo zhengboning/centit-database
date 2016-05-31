@@ -137,7 +137,7 @@ public class QueryAndParams {
                     break;
                 Object obj = namedParams.get(aWord);
                 if(obj==null){
-                	params.add(obj);
+                	params.add(null);
 	                sqlb.append("?");
                 }else if (obj instanceof Collection) {
                 	int n=0;
